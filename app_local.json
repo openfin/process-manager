@@ -7,7 +7,7 @@
     "name":"process-manager",
     "version":"1.4.0",
     "description":"Process Manager",
-    "url":"https://demoappdirectory.openf.in/desktop/systempanel/2.0.5.16/index.html",
+    "url":"http://localhost:5040/index.html",
     "uuid":"process-manager",
     "defaultHeight":800,
     "defaultWidth":600,
@@ -19,6 +19,7 @@
     "arguments": "",
     "version": "stable"
   },
+  "splashScreenImage": "http://localhost:5040/splashscreen/splash_process.png",
   "shortcut": {
     "company": "OpenFin",
     "description": "OpenFin Process Manager",
