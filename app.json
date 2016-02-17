@@ -1,0 +1,28 @@
+{
+  "default_icon": "default_icon.png",
+  "devtools_port": 9090,
+  "websocket_port": 9696,
+  "logging": true,
+  "startup_app": {
+    "name":"process-manager",
+    "version":"1.4.0",
+    "description":"Process Manager",
+    "url":"https://demoappdirectory.openf.in/desktop/systempanel/2.0.5.16/index.html",
+    "uuid":"process-manager",
+    "defaultHeight":800,
+    "defaultWidth":600,
+    "applicationIcon":"https://demoappdirectory.openf.in/desktop/config/apps/OpenFin/ProcessManager/rvm/icon.png",
+    "company":"OpenFin",
+    "autoShow":true
+  },
+  "runtime": {
+    "arguments": "",
+    "version": "stable"
+  },
+  "shortcut": {
+    "company": "OpenFin",
+    "description": "OpenFin Process Manager",
+    "icon": "https://demoappdirectory.openf.in/desktop/config/apps/OpenFin/ProcessManager/rvm/icon.ico",
+    "name": "Process Manager"
+  }
+}
