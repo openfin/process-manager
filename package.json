@@ -1,0 +1,25 @@
+{
+  "name": "process-manager",
+  "version": "1.0.0",
+  "description": "Process manager built on OpenFin",
+  "main": "server.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openfin/process-manager.git"
+  },
+  "keywords": [
+    "openfin"
+  ],
+  "author": "Graham Clapham <clapham.graham@gmail.com> (http://www.grahamclapham.co.uk/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/openfin/process-manager/issues"
+  },
+  "homepage": "https://github.com/openfin/process-manager#readme"
+}
