@@ -16,7 +16,6 @@
   "keywords": [
     "openfin"
   ],
-  "author": "Graham Clapham <clapham.graham@gmail.com> (http://www.grahamclapham.co.uk/)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/openfin/process-manager/issues"
