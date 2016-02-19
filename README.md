@@ -4,7 +4,7 @@ Process Manager demonstrates an HTML5 application that has privileged access to 
 
 
 ## Demo Example
-* Click this OpenFin [Process Manager Installer](https://dl.openfin.co/services/download?fileName=process-manager-installer&config=https://demoappdirectory.openf.in/desktop/config/apps/OpenFin/ProcessManager/app.json)
+* Click this OpenFin [Process Manager Installer](https://dl.openfin.co/services/download?fileName=process-manager-installer&config=https://cdn.openfin.co/demos/process-manager/app.json)
 * Unzip and run the installer
 * Double click the icon it creates on your desktop
 

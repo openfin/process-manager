@@ -5,13 +5,13 @@
   "logging": true,
   "startup_app": {
     "name":"process-manager",
-    "version":"1.4.0",
+    "version":"1.4.1",
     "description":"Process Manager",
-    "url":"https://demoappdirectory.openf.in/desktop/systempanel/2.0.5.16/index.html",
+    "url":"https://cdn.openfin.co/demos/process-manager/index.html",
     "uuid":"process-manager",
     "defaultHeight":800,
     "defaultWidth":600,
-    "applicationIcon":"https://demoappdirectory.openf.in/desktop/config/apps/OpenFin/ProcessManager/rvm/icon.png",
+    "applicationIcon":"https://cdn.openfin.co/demos/process-manager/img/icon.ico",
     "company":"OpenFin",
     "autoShow":true
   },
@@ -19,11 +19,11 @@
     "arguments": "",
     "version": "stable"
   },
-  "splashScreenImage": "https://demoappdirectory.openf.in/desktop/systempanel/2.0.5.16/splashscreen/splash_process.png",
+  "splashScreenImage": "https://cdn.openfin.co/demos/process-manager/splashscreen/splash_process.png",
   "shortcut": {
     "company": "OpenFin",
     "description": "OpenFin Process Manager",
-    "icon": "https://demoappdirectory.openf.in/desktop/config/apps/OpenFin/ProcessManager/rvm/icon.ico",
+    "icon": "https://cdn.openfin.co/demos/process-manager/img/icon.ico",
     "name": "Process Manager"
   }
 }

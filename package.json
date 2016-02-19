@@ -7,7 +7,8 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+      "deploy" : "aws s3 cp ./ s3://cdn.openfin.co/demos/process-manager/ --exclude 'node_modules/**' --exclude '.git/**' --exclude '.idea/**' --recursive --cache-control max-age=60",
+      "start": "node server.js"
   },
   "repository": {
     "type": "git",
