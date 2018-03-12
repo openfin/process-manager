@@ -4,7 +4,7 @@ Process Manager demonstrates an HTML5 application that has privileged access to 
 
 
 ## Demo Example
-* Click this OpenFin [Process Manager Installer](https://dl.openfin.co/services/download?fileName=process-manager-installer&config=https://cdn.openfin.co/demos/process-manager/app.json).
+* Click this OpenFin [Process Manager Installer](https://install.openfin.co/download?fileName=ProcessManager&config=https://cdn.openfin.co/demos/process-manager/app.json).
 * Unzip and run the installer.
 * Double click the icon it creates on your desktop.
 
@@ -14,5 +14,5 @@ Process Manager demonstrates an HTML5 application that has privileged access to 
 * Open a command-line terminal and navigate to the **app-launchpad** directory.
 * In the terminal, run `npm install`.
 * After all packages have been installed, run `node server`.
-* Download a locally running version with this [Local Process Manager Installer link](https://dl.openfin.co/services/download?fileName=process-manager-local&config=http://localhost:5040/app_local.json).
+* Download a locally running version with this [Local Process Manager Installer link](https://install.openfin.co/download?fileName=process-manager-local&config=http://localhost:5040/app_local.json).
 * Unzip and run the installer.
