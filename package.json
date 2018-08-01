@@ -2,13 +2,28 @@
   "name": "process-manager",
   "version": "1.0.0",
   "description": "Process manager built on OpenFin",
-  "main": "server.js",
   "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/openfin": "^29.0.1",
+    "copy-webpack-plugin": "^4.5.2",
+    "express": "^4.16.3",
+    "gts": "^0.8.0",
+    "hadouken-js-adapter": "^0.32.1-alpha.5",
+    "ts-loader": "^4.4.2",
+    "typescript": "^2.9.2",
+    "webpack": "^4.16.2",
+    "webpack-cli": "^3.1.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-      "deploy" : "aws s3 cp ./ s3://cdn.openfin.co/demos/process-manager/ --exclude 'node_modules/**' --exclude '.git/**' --exclude '.idea/**' --recursive --cache-control max-age=60",
-      "start": "node server.js"
+    "build": "webpack --mode development",
+    "start": "node server.js",
+    "check": "gts check",
+    "clean": "gts clean",
+    "compile": "tsc -p .",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run check"
   },
   "repository": {
     "type": "git",
@@ -17,7 +32,7 @@
   "keywords": [
     "openfin"
   ],
-  "license": "MIT",
+  "license": "Apache2",
   "bugs": {
     "url": "https://github.com/openfin/process-manager/issues"
   },
