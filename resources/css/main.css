@@ -138,3 +138,7 @@ button {
 #c-processes .launchDebugger {
     padding:0 5px;
 }
+
+#c-logs .table .row .cell:last-child {
+    text-align: right;
+}

@@ -12,6 +12,13 @@ interface Manifest {
 interface StartUpApp {
     url: string;
 }
+interface LogFile {
+    fileName: string;
+    formattedDate: string;
+    date: Date;
+    size: number;
+    formattedSize: string;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const SELECTED = 'selected';
@@ -122,8 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const headElem = document.querySelector('#c-logs .thead');
         if (headElem !== null) {
             const row = createRow();
+            row.appendChild(createCol('Date/Time'));
             row.appendChild(createCol('Application'));
-            row.appendChild(createCol('Date'));
             row.appendChild(createCol('Size'));
             headElem.appendChild(row);
         }
@@ -133,16 +140,47 @@ document.addEventListener('DOMContentLoaded', () => {
         const logElem = document.querySelector('#c-logs .tbody');
         if (logElem !== null) {
             fin.desktop.System.getLogList((list) => {
-                for (let i = 0; i < list.length; i++) {
-                    const log = list[i];
+                const newList = processLogList(list);
+                for (let i = 0; i < newList.length; i++) {
+                    const log = newList[i];
                     const row = createRow();
-                    row.appendChild(createCol(log.name || ''));
-                    row.appendChild(createCol(log.date || ''));
-                    row.appendChild(createCol((log.size || -1).toString()));
+                    row.appendChild(createCol(log.formattedDate));
+                    row.appendChild(createCol(log.fileName));
+                    row.appendChild(createCol(log.formattedSize));
                     logElem.appendChild(row);
                 }
             });
         }
+    };
+
+    const processLogList = (list: fin.LogInfo[]): LogFile[] => {
+        const results = new Array<LogFile>();
+        for (let i = 0; i < list.length; i++) {
+            const log = list[i];
+            results[results.length] = makeProcessedLogInfo(log);
+        }
+        results.sort((a: LogFile, b: LogFile) => {
+            if (a.date === b.date) {
+                return 0;
+            }
+            return (a.date > b.date) ? -1 : 1;
+        });
+        return results;
+    };
+
+    const makeProcessedLogInfo = (log: fin.LogInfo): LogFile => {
+        const dateOpts = {year: 'numeric', month: '2-digit', day: '2-digit'};
+        const timeOpts = {hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'};
+        const logDate = new Date(Date.parse(log.date || ''));
+        const logSize = log.size || 0;
+        const newInfo = {
+            fileName: log.name || '',
+            size: logSize,
+            formattedSize: logSize.toLocaleString(),
+            date: logDate,
+            formattedDate: logDate.toLocaleDateString('en-US', dateOpts) + ' ' + logDate.toLocaleTimeString('en-US', timeOpts)
+        };
+        return newInfo;
     };
 
     // utilities
@@ -153,11 +191,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return e;
     };
 
-    const createCol = (val: string, addTitle?:boolean): HTMLElement => {
+    const createCol = (val: string, addTitle?: boolean): HTMLElement => {
         const c = document.createElement('div');
         c.classList.add('cell');
         c.innerText = val;
-        if (addTitle===true) {
+        if (addTitle === true) {
             c.setAttribute('title', val);
         }
         return c;
@@ -170,11 +208,11 @@ document.addEventListener('DOMContentLoaded', () => {
         launcher.setAttribute('class', 'launchDebugger');
         launcher.innerHTML = '&#x1f41b;';
         launcher.addEventListener('click', () => {
-            fin.desktop.System.showDeveloperTools(proc.uuid||'', proc.name||'', console.log, console.error);
+            fin.desktop.System.showDeveloperTools(proc.uuid || '', proc.name || '', console.log, console.error);
         });
         launchCol.appendChild(launcher);
         return launchCol;
-    }
+    };
 
     const getRuntimeVersion = (ai: AppInfo) => {
         if (ai && ai.runtime) {
