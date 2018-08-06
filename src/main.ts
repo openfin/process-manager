@@ -31,7 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
         contents[0].classList.add(SELECTED);
 
         for (let i = 0; i < tabs.length; i++) {
-            tabs[i].addEventListener('click', (e: Event) => {
+            const tab = tabs[i];
+            tab.addEventListener('click', (e: Event) => {
                 if (e.srcElement !== null) {
                     handleTabClick(e.srcElement as HTMLElement);
                 }
@@ -40,15 +41,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const handleTabClick = (elem: HTMLElement) => {
-        // deslect everything
-        for (let i = 0; i < tabs.length; i++) {
-            tabs[i].classList.remove(SELECTED);
-            contents[i].classList.remove(SELECTED);
-        }
-        // select the tab/content that was clicked
-        elem.classList.add(SELECTED);
         let id = elem.getAttribute('id');
-        if (id != null) {
+        if (id) {
+            // deslect everything
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove(SELECTED);
+                contents[i].classList.remove(SELECTED);
+            }
+            elem.classList.add(SELECTED);
             id = id.replace('tab-', 'c-');
             const content = document.getElementById(id);
             if (content !== null) {
@@ -62,6 +62,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const initProcessList = () => {
         writeProcessHeaders();
         updateProcessList();
+        const refBtn = document.querySelector('#c-processes .refreshButton');
+        if (refBtn) {
+            refBtn.addEventListener('click', updateProcessList);
+        }
     };
 
     const writeProcessHeaders = () => {
@@ -73,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
             row.appendChild(createCol('URL'));
             row.appendChild(createCol('Process ID'));
             row.appendChild(createCol('Runtime'));
+            row.appendChild(createCol('Debug'));
             headElem.appendChild(row);
         }
     };
@@ -80,21 +85,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateProcessList = () => {
         const procElem = document.querySelector('#c-processes .tbody');
         if (procElem !== null) {
+            procElem.innerHTML = '';
             fin.desktop.System.getProcessList(async (list) => {
                 for (let i = 0; i < list.length; i++) {
                     const proc = list[i];
                     const appInf = await new Promise((res, rej) => {
                         fin.desktop.Application.wrap(proc.uuid || '').getInfo(res, rej);
                     });
+
                     const row = createRow();
                     row.appendChild(createCol(getAppNameUUID(proc)));
                     row.appendChild(createCol(getManifest(appInf as AppInfo)));
                     row.appendChild(createCol(getAppURL(appInf as AppInfo)));
                     row.appendChild(createCol((proc.processId || -1).toString()));
                     row.appendChild(createCol(getRuntimeVersion(appInf as AppInfo)));
-
-                    // TODO get mem/cpu, etc?
-
+                    row.appendChild(createDebugLauncherCol(proc, appInf as AppInfo));
                     procElem.appendChild(row);
                 }
             });
@@ -104,6 +109,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const initLogList = () => {
         writeLogHeaders();
         updateLogList();
+        const refBtn = document.querySelector('#c-logs .refreshButton');
+        if (refBtn) {
+            refBtn.addEventListener('click', updateLogList);
+        }
     };
 
     const writeLogHeaders = () => {
@@ -147,6 +156,19 @@ document.addEventListener('DOMContentLoaded', () => {
         c.innerText = val;
         return c;
     };
+
+    const createDebugLauncherCol = (proc: fin.ProcessInfo, ai: AppInfo): HTMLElement => {
+        const launchCol = document.createElement('div');
+        launchCol.classList.add('cell');
+        const launcher = document.createElement('button');
+        launcher.setAttribute('class', 'launchDebugger');
+        launcher.innerHTML = '&#x1f41b;';
+        launcher.addEventListener('click', () => {
+            fin.desktop.System.showDeveloperTools(proc.uuid||'', proc.name||'', console.log, console.error);
+        });
+        launchCol.appendChild(launcher);
+        return launchCol;
+    }
 
     const getRuntimeVersion = (ai: AppInfo) => {
         if (ai && ai.runtime) {

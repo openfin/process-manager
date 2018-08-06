@@ -16,6 +16,7 @@ function createWebpackConfigForTS(infile, outfile) {
             path: outputDir,
             filename: outfile + '.js'
         },
+        devtool: 'inline-source-map',
         resolve: {
             extensions: ['.ts']
         },

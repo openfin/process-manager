@@ -1,3 +1,7 @@
+/* some defaults */
+html {
+    height: 100%;
+}
 body {
     font-family: Arial, Helvetica, sans-serif;
     margin: 0;
@@ -5,14 +9,23 @@ body {
     position:relative;
     height: 100%;
 }
-
+button {
+    border: 1px solid #afafaf;
+    font-size: 16px;
+    border-radius: 2px;
+    border:1px solid #777;
+}
 #content {
     position:relative;
     height: 100%;
 }
 
+
+/* tab bar and content */
+
+
 #tab-bar {
-    height: 32px;
+    height: 40px;
     margin: 10px 0 0 0;
     padding:0 5px;
     position: relative;
@@ -26,7 +39,7 @@ body {
     border: 1px solid #afafaf;
     display: inline-block;
     position:relative;
-    top: 4px;
+    top: 12px;
     z-index: 4;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
@@ -36,7 +49,7 @@ body {
     height: 26px;
     background-color: #fff;
     border-bottom: 1px solid white;
-    top: 0px;
+    top: 8px;
 }
 
 #tab-bar .top-tab:last-child {
@@ -49,7 +62,7 @@ body {
     top: -1px;
     z-index: 3;
     padding: 10px;
-    height: calc(100% - 32px);
+    height: calc(100% - 80px);
     border-radius: 4px;
 }
 
@@ -57,11 +70,22 @@ body {
     display: none;
     width: 100%;
     height: 100%;
+    position: relative;
+}
+.tab-content .refreshButton {
+    position: absolute;
+    font-weight: bold;
+    top: -46px;
+    right: 0px;
 }
 
 .tab-content.selected {
     display: block;
 }
+
+
+/* table stuff */
+
 
 .table {
     display: table;
@@ -90,4 +114,22 @@ body {
     background-color: #eee;
     padding: 6px 2px;
     font-weight: bold;
+}
+
+
+/* content specify styles */
+
+
+#c-processes .cell:last-child {
+    text-align: center;
+}
+
+#c-processes .cell {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#c-processes .launchDebugger {
+    padding:0 5px;
 }
