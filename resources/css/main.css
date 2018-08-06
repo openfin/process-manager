@@ -119,15 +119,20 @@ button {
 
 /* content specify styles */
 
-
-#c-processes .cell:last-child {
-    text-align: center;
-}
-
-#c-processes .cell {
+#c-processes .table .row .cell {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+#c-processes .table .row .cell:first-child, #c-processes .table .row .cell:last-child, #c-processes .table .row .cell:nth-last-child(1) {
+    max-width:60px;
+}
+#c-processes .table .row .cell:last-child {
+    text-align: center;
+}
+#c-processes .table .row .cell:nth-child(2), #c-processes .table .row .cell:nth-child(3), #c-processes .table .row .cell:nth-child(4) {
+    max-width: 1px;
+    width:28%;
 }
 
 #c-processes .launchDebugger {

@@ -1,10 +1,13 @@
 interface AppInfo {
     runtime: AppVersion;
     manifestUrl: string;
-    startup_app: StartUpApp;
+    manifest: Manifest;
 }
 interface AppVersion {
     version: string;
+}
+interface Manifest {
+    startup_app: StartUpApp;
 }
 interface StartUpApp {
     url: string;
@@ -72,10 +75,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const headElem = document.querySelector('#c-processes .thead');
         if (headElem !== null) {
             const row = createRow();
+            row.appendChild(createCol('ID'));
             row.appendChild(createCol('Application'));
-            row.appendChild(createCol('Manifest'));
             row.appendChild(createCol('URL'));
-            row.appendChild(createCol('Process ID'));
+            row.appendChild(createCol('Manifest'));
             row.appendChild(createCol('Runtime'));
             row.appendChild(createCol('Debug'));
             headElem.appendChild(row);
@@ -94,10 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
 
                     const row = createRow();
-                    row.appendChild(createCol(getAppNameUUID(proc)));
-                    row.appendChild(createCol(getManifest(appInf as AppInfo)));
-                    row.appendChild(createCol(getAppURL(appInf as AppInfo)));
                     row.appendChild(createCol((proc.processId || -1).toString()));
+                    row.appendChild(createCol(getAppNameUUID(proc), true));
+                    row.appendChild(createCol(getAppURL(appInf as AppInfo), true));
+                    row.appendChild(createCol(getManifest(appInf as AppInfo), true));
                     row.appendChild(createCol(getRuntimeVersion(appInf as AppInfo)));
                     row.appendChild(createDebugLauncherCol(proc, appInf as AppInfo));
                     procElem.appendChild(row);
@@ -150,10 +153,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return e;
     };
 
-    const createCol = (val: string): HTMLElement => {
+    const createCol = (val: string, addTitle?:boolean): HTMLElement => {
         const c = document.createElement('div');
         c.classList.add('cell');
         c.innerText = val;
+        if (addTitle===true) {
+            c.setAttribute('title', val);
+        }
         return c;
     };
 
@@ -179,7 +185,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const getAppNameUUID = (proc: fin.ProcessInfo): string => {
         if (proc !== null) {
-            return proc.name + ' (' + proc.uuid + ')';
+            // return proc.name + ' (' + proc.uuid + ')';
+            return proc.uuid || proc.name || '';
         }
         return '--';
     };
@@ -192,8 +199,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const getAppURL = (ai: AppInfo): string => {
-        if (ai && ai.startup_app) {
-            return ai.startup_app.url;
+        if (ai && ai.manifest && ai.manifest.startup_app) {
+            return ai.manifest.startup_app.url;
         }
         return '';
     };
