@@ -142,3 +142,7 @@ button {
 #c-logs .table .row .cell:last-child {
     text-align: right;
 }
+
+#logger {
+    font-size:12px;
+}

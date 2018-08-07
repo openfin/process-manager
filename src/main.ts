@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const log = newList[i];
                     const row = createRow();
                     row.appendChild(createCol(log.formattedDate));
-                    row.appendChild(createCol(log.fileName));
+                    row.appendChild(createLogLauncherCol(log));
                     row.appendChild(createCol(log.formattedSize));
                     logElem.appendChild(row);
                 }
@@ -209,6 +209,22 @@ document.addEventListener('DOMContentLoaded', () => {
         launcher.innerHTML = '&#x1f41b;';
         launcher.addEventListener('click', () => {
             fin.desktop.System.showDeveloperTools(proc.uuid || '', proc.name || '', console.log, console.error);
+        });
+        launchCol.appendChild(launcher);
+        return launchCol;
+    };
+
+    const createLogLauncherCol = (log: LogFile): HTMLElement => {
+        const launchCol = document.createElement('div');
+        launchCol.classList.add('cell');
+        const launcher = document.createElement('a');
+        launcher.setAttribute('href', '#' + log.fileName);
+        launcher.innerHTML = log.fileName;
+        launcher.addEventListener('click', () => {
+            const opts: fin.WindowOptions = {name: log.fileName, autoShow: true, url: 'log.html', defaultWidth: 600, defaultHeight: 400};
+            const logWin: fin.OpenFinWindow = new fin.desktop.Window(opts, () => {
+                logWin.getNativeWindow().postMessage(log.fileName, '*');
+            }, (e) => console.error('error loading log file' + e));
         });
         launchCol.appendChild(launcher);
         return launchCol;
