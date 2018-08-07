@@ -3,21 +3,19 @@
 <head>
     <title>OpenFin After Image</title>
     <script>
-    window.addEventListener("message", (e) => {
-        const filename = e.data;
-        if (filename) {
-            loadLogFile(filename);
-        }
-    }, false);
-
-    const loadLogFile = (fileName) => {
-        const logger = document.querySelector('#logger');
-        if (logger) {
-            fin.desktop.System.getLog(fileName, (entries) => {
-                logger.innerHTML = entries.replace('\n', '<br/>');
-            }, (error) => console.log("Error creating log window:", error));
-        }
-    };
+        document.addEventListener('DOMContentLoaded', () => {
+            const logger = document.querySelector('#logger');
+            if (logger) {
+                window.addEventListener("message", (e) => {
+                    const filename = e.data;
+                    if (filename) {
+                        fin.desktop.System.getLog(filename, (entries) => {
+                            logger.innerHTML = entries;
+                        }, (error) => console.log("Error creating log window:", error));
+                    }
+                }, false);
+            }
+        });
     </script>
     <link rel="stylesheet" href="css/main.css"></link>
 </head>

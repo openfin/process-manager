@@ -144,5 +144,8 @@ button {
 }
 
 #logger {
-    font-size:12px;
+    font-size: 12px;
+    white-space: pre;
+    overflow-x: scroll;
+    height: 100%;
 }

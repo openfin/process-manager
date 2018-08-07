@@ -139,6 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateLogList = () => {
         const logElem = document.querySelector('#c-logs .tbody');
         if (logElem !== null) {
+            logElem.innerHTML = '';
             fin.desktop.System.getLogList((list) => {
                 const newList = processLogList(list);
                 for (let i = 0; i < newList.length; i++) {
