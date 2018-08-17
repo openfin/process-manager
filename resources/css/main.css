@@ -11,7 +11,6 @@ body {
 }
 button {
     border: 1px solid #afafaf;
-    font-size: 16px;
     border-radius: 2px;
     border:1px solid #777;
 }
@@ -75,6 +74,7 @@ button {
 .tab-content .refreshButton {
     position: absolute;
     font-weight: bold;
+    font-size: 16px;
     top: -46px;
     right: 0px;
 }
@@ -125,7 +125,7 @@ button {
     text-overflow: ellipsis;
 }
 #c-processes .table .row .cell:first-child, #c-processes .table .row .cell:last-child, #c-processes .table .row .cell:nth-last-child(1) {
-    max-width:60px;
+    max-width:80px;
 }
 #c-processes .table .row .cell:last-child {
     text-align: center;
@@ -135,8 +135,11 @@ button {
     width:28%;
 }
 
-#c-processes .launchDebugger {
-    padding:0 5px;
+#c-processes .launchDebugger, #c-processes .appInfo {
+    height: 28px;
+    width: 28px;
+    margin:0 2px;
+    font-size: 12px;
 }
 
 #c-logs .table .row .cell:last-child {
@@ -148,4 +151,20 @@ button {
     white-space: pre;
     overflow-x: scroll;
     height: 100%;
+}
+
+#appDetails {
+    display: none;
+    position: absolute;
+    white-space: pre;
+    background: #ccc;
+    border: 1px solid #777;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+#appDetails.showing {
+    display: block;
+    top: 20%;
+    left: 20%;
 }

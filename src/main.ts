@@ -1,3 +1,5 @@
+import { privateDecrypt } from "crypto";
+
 interface AppInfo {
     runtime: AppVersion;
     manifestUrl: string;
@@ -69,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // process list stuff
 
+    const processCache: {[key:string]:AppInfo} = {};
     const initProcessList = () => {
         writeProcessHeaders();
         updateProcessList();
@@ -103,13 +106,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         fin.desktop.Application.wrap(proc.uuid || '').getInfo(res, rej);
                     });
 
+                    processCache[proc.uuid || ''] = appInf as AppInfo;
+
                     const row = createRow();
                     row.appendChild(createCol((proc.processId || -1).toString()));
                     row.appendChild(createCol(getAppNameUUID(proc), true));
                     row.appendChild(createCol(getAppURL(appInf as AppInfo), true));
                     row.appendChild(createCol(getManifest(appInf as AppInfo), true));
                     row.appendChild(createCol(getRuntimeVersion(appInf as AppInfo)));
-                    row.appendChild(createDebugLauncherCol(proc, appInf as AppInfo));
+                    row.appendChild(createProcActionsCol(proc, appInf as AppInfo));
                     procElem.appendChild(row);
                 }
             });
@@ -202,9 +207,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return c;
     };
 
-    const createDebugLauncherCol = (proc: fin.ProcessInfo, ai: AppInfo): HTMLElement => {
+    const createProcActionsCol = (proc: fin.ProcessInfo, ai: AppInfo): HTMLElement => {
         const launchCol = document.createElement('div');
         launchCol.classList.add('cell');
+
         const launcher = document.createElement('button');
         launcher.setAttribute('class', 'launchDebugger');
         launcher.innerHTML = '&#x1f41b;';
@@ -212,8 +218,39 @@ document.addEventListener('DOMContentLoaded', () => {
             fin.desktop.System.showDeveloperTools(proc.uuid || '', proc.name || '', console.log, console.error);
         });
         launchCol.appendChild(launcher);
+
+        const info = document.createElement('button');
+        info.setAttribute('class', 'appInfo');
+        info.innerHTML = '&#9432;';
+        info.addEventListener('click', () => {
+            showAppInfo(proc);
+        });
+        launchCol.appendChild(info);
+
         return launchCol;
     };
+
+    const showAppInfo = (proc:fin.ProcessInfo) => {
+        console.log('show app info for: ' + JSON.stringify(processCache[proc.uuid||''].manifest, null, 4));
+        const appInfoDiv = document.getElementById('appDetails');
+        if (appInfoDiv) {
+            appInfoDiv.innerHTML = JSON.stringify(processCache[proc.uuid||''].manifest, null, 4);
+            appInfoDiv.classList.add('showing');
+        }
+    };
+
+    const hideAppInfo = () => {
+        const appInfoDiv = document.getElementById('appDetails');
+        if (appInfoDiv) {
+            appInfoDiv.classList.remove('showing');
+        }
+    };
+
+    document.addEventListener('keyup', (e) => {
+        if (e.keyCode === 27) {
+            hideAppInfo();
+        }
+    });
 
     const createLogLauncherCol = (log: LogFile): HTMLElement => {
         const launchCol = document.createElement('div');
