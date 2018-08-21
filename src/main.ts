@@ -1,5 +1,3 @@
-import { privateDecrypt } from "crypto";
-
 interface AppInfo {
     runtime: AppVersion;
     manifestUrl: string;
