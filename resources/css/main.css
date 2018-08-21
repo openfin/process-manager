@@ -125,7 +125,7 @@ button {
     text-overflow: ellipsis;
 }
 #c-processes .table .row .cell:first-child, #c-processes .table .row .cell:last-child, #c-processes .table .row .cell:nth-last-child(1) {
-    max-width:80px;
+    max-width:120px;
 }
 #c-processes .table .row .cell:last-child {
     text-align: center;
@@ -135,11 +135,15 @@ button {
     width:28%;
 }
 
-#c-processes .launchDebugger, #c-processes .appInfo {
+#c-processes .launchDebugger, #c-processes .appInfo, #c-processes .closeApp {
     height: 28px;
     width: 28px;
     margin:0 2px;
     font-size: 12px;
+}
+
+#c-processes .appInfo {
+    font-size: 13px;
 }
 
 #c-logs .table .row .cell:last-child {

@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             row.appendChild(createCol('URL'));
             row.appendChild(createCol('Manifest'));
             row.appendChild(createCol('Runtime'));
-            row.appendChild(createCol('Debug'));
+            row.appendChild(createCol('Actions'));
             headElem.appendChild(row);
         }
     };
@@ -227,16 +227,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         launchCol.appendChild(info);
 
+        const closer = document.createElement('button');
+        closer.setAttribute('class', 'closeApp');
+        closer.innerHTML = '&#x274C;';
+        closer.addEventListener('click', () => {
+            closeApp(proc);
+        });
+        launchCol.appendChild(closer);
+
         return launchCol;
     };
 
     const showAppInfo = (proc:fin.ProcessInfo) => {
-        console.log('show app info for: ' + JSON.stringify(processCache[proc.uuid||''].manifest, null, 4));
         const appInfoDiv = document.getElementById('appDetails');
         if (appInfoDiv) {
             appInfoDiv.innerHTML = JSON.stringify(processCache[proc.uuid||''].manifest, null, 4);
             appInfoDiv.classList.add('showing');
         }
+    };
+
+    const closeApp = (proc:fin.ProcessInfo) => {
+        console.log('closing app ' + proc.uuid);
+        fin.desktop.Application.wrap(proc.uuid||'').close();
     };
 
     const hideAppInfo = () => {
