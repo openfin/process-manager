@@ -5,7 +5,7 @@ html {
 body {
     font-family: Arial, Helvetica, sans-serif;
     margin: 0;
-    padding: 0 5px;
+    padding: 0;
     position:relative;
     height: 100%;
 }
@@ -14,140 +14,25 @@ button {
     border-radius: 2px;
     border:1px solid #777;
 }
+
 #content {
     position:relative;
     height: 100%;
-}
-
-
-/* tab bar and content */
-
-
-#tab-bar {
-    height: 40px;
     margin: 10px 0 0 0;
-    padding:0 5px;
-    position: relative;
-    list-style: none;
 }
 
-#tab-bar .top-tab {
-    height: 22px;
-    padding: 4px 10px 0 10px;
-    background-color: #eaeaea;
-    border: 1px solid #afafaf;
-    display: inline-block;
-    position:relative;
-    top: 12px;
-    z-index: 4;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
+.ant-tabs-bar {
+    padding: 0 0 0 10px;
+}
+.ant-tabs-content {
+    padding: 0 10px;
 }
 
-#tab-bar .top-tab.selected {
-    height: 26px;
-    background-color: #fff;
-    border-bottom: 1px solid white;
-    top: 8px;
-}
-
-#tab-bar .top-tab:last-child {
-    border-right: 1px solid #afafaf;
-}
-
-#tab-contents {
-    border: 1px solid #afafaf;
-    position: relative;
-    top: -1px;
-    z-index: 3;
-    padding: 10px;
-    height: calc(100% - 80px);
-    border-radius: 4px;
-}
-
-.tab-content {
-    display: none;
-    width: 100%;
-    height: 100%;
-    position: relative;
-}
-.tab-content .refreshButton {
-    position: absolute;
-    font-weight: bold;
-    font-size: 16px;
-    top: -46px;
-    right: 0px;
-}
-
-.tab-content.selected {
-    display: block;
-}
-
-
-/* table stuff */
-
-
-.table {
-    display: table;
-    width: 100%;
-}
-
-.table .thead {
-    display: table-header-group;
-}
-
-.table .tbody {
-    display: table-row-group;
-}
-
-.table .row {
-    display: table-row;
-}
-
-.table .row .cell {
-    display: table-cell;
-    width: auto;
-    padding: 3px 4px;
-}
-
-.table .thead .row .cell {
-    background-color: #eee;
-    padding: 6px 2px;
-    font-weight: bold;
-}
-
-
-/* content specify styles */
-
-#c-processes .table .row .cell {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-#c-processes .table .row .cell:first-child, #c-processes .table .row .cell:last-child, #c-processes .table .row .cell:nth-last-child(1) {
-    max-width:120px;
-}
-#c-processes .table .row .cell:last-child {
-    text-align: center;
-}
-#c-processes .table .row .cell:nth-child(2), #c-processes .table .row .cell:nth-child(3), #c-processes .table .row .cell:nth-child(4) {
-    max-width: 1px;
-    width:28%;
-}
-
-#c-processes .launchDebugger, #c-processes .appInfo, #c-processes .closeApp {
-    height: 28px;
-    width: 28px;
-    margin:0 2px;
-    font-size: 12px;
-}
-
-#c-processes .appInfo {
-    font-size: 13px;
-}
-
-#c-logs .table .row .cell:last-child {
+.cell-right {
     text-align: right;
+}
+.cell-center {
+    text-align: center;
 }
 
 #logger {
@@ -155,6 +40,8 @@ button {
     white-space: pre;
     overflow-x: scroll;
     height: 100%;
+    background:#222;
+    color: #ddd;
 }
 
 #appDetails {
