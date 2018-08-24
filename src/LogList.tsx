@@ -53,6 +53,12 @@ export class LogList extends React.Component<LogListProps, {}> {
         return <ReactTable
             data={(this.state as LogListState).logs}
             columns={this.columns}
+            minRows={15}
+            showPagination={false}
+            style={{
+                height: "calc(100vh - 79px)"
+            }}
+            className="-striped -highlight"
         />;
     }
 
