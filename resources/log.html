@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>OpenFin After Image</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const logger = document.querySelector('#logger');
+            if (logger) {
+                window.addEventListener("message", (e) => {
+                    const filename = e.data;
+                    if (filename) {
+                        fin.desktop.System.getLog(filename, (entries) => {
+                            logger.innerHTML = entries;
+                        }, (error) => console.log("Error creating log window:", error));
+                    }
+                }, false);
+            }
+        });
+    </script>
+    <link rel="stylesheet" href="css/main.css"></link>
+</head>
+<body>
+    <div id="logger"></div>
+</body>
+</html>

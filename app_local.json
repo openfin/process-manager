@@ -11,19 +11,14 @@
     "uuid":"process-manager",
     "defaultHeight":800,
     "defaultWidth":600,
-    "applicationIcon":"https://demoappdirectory.openf.in/desktop/config/apps/OpenFin/ProcessManager/rvm/icon.png",
+    "applicationIcon":"http://localhost:5040/img/after-image-icon.png",
     "company":"OpenFin",
+    "saveWindowState" : true,
     "autoShow":true
   },
   "runtime": {
     "arguments": "",
-    "version": "stable"
+    "version": "9.61.33.32"
   },
-  "splashScreenImage": "http://localhost:5040/splashscreen/splash_process.png",
-  "shortcut": {
-    "company": "OpenFin",
-    "description": "OpenFin Process Manager",
-    "icon": "https://demoappdirectory.openf.in/desktop/config/apps/OpenFin/ProcessManager/rvm/icon.ico",
-    "name": "Process Manager"
-  }
+  "splashScreenImage": "http://localhost:5040/img/after-image-splash.png"
 }

@@ -1,0 +1,63 @@
+/* some defaults */
+html {
+    height: 100%;
+}
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    position:relative;
+    height: 100%;
+    overflow: hidden;
+}
+button {
+    border: 1px solid #afafaf;
+    border-radius: 2px;
+    border:1px solid #777;
+}
+
+#content {
+    position:relative;
+    height: 100%;
+    margin: 10px 0 0 0;
+}
+
+.ant-tabs-bar {
+    padding: 0 0 0 10px;
+}
+.ant-tabs-content {
+    padding: 0 10px;
+}
+
+.cell-right {
+    text-align: right;
+}
+.cell-center {
+    text-align: center;
+}
+
+#logger {
+    font-size: 12px;
+    white-space: pre;
+    overflow-x: scroll;
+    height: 100%;
+    background:#222;
+    color: #ddd;
+}
+
+#appDetails {
+    display: none;
+    position: absolute;
+    white-space: pre;
+    background: #ccc;
+    border: 1px solid #777;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+#appDetails.showing {
+    display: block;
+    top: 20%;
+    left: 20%;
+    z-index: 10;
+}

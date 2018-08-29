@@ -2,13 +2,40 @@
   "name": "process-manager",
   "version": "1.0.0",
   "description": "Process manager built on OpenFin",
-  "main": "server.js",
-  "dependencies": {},
-  "devDependencies": {},
+  "dependencies": {
+    "antd": "^3.8.2",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "react-table": "^6.8.6"
+  },
+  "devDependencies": {
+    "@types/openfin": "^29.0.1",
+    "@types/react": "^16.4.11",
+    "@types/react-dom": "^16.0.7",
+    "@types/react-table": "^6.7.12",
+    "copy-webpack-plugin": "^4.5.2",
+    "css-loader": "^1.0.0",
+    "express": "^4.16.3",
+    "gts": "^0.8.0",
+    "hadouken-js-adapter": "^0.32.1-alpha.5",
+    "less": "^3.8.1",
+    "less-loader": "^4.1.0",
+    "style-loader": "^0.22.1",
+    "ts-loader": "^4.4.2",
+    "typescript": "^2.9.2",
+    "webpack": "^4.16.2",
+    "webpack-cli": "^3.1.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-      "deploy" : "aws s3 cp ./ s3://cdn.openfin.co/demos/process-manager/ --exclude 'node_modules/**' --exclude '.git/**' --exclude '.idea/**' --recursive --cache-control max-age=60",
-      "start": "node server.js"
+    "build": "webpack --mode development",
+    "start": "node server.js",
+    "check": "gts check",
+    "clean": "gts clean",
+    "compile": "tsc -p .",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run check"
   },
   "repository": {
     "type": "git",
@@ -17,7 +44,7 @@
   "keywords": [
     "openfin"
   ],
-  "license": "MIT",
+  "license": "Apache2",
   "bugs": {
     "url": "https://github.com/openfin/process-manager/issues"
   },
