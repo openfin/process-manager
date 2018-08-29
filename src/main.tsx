@@ -46,10 +46,16 @@ export class App extends React.Component<AppProps, {}> {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {    
-    
-    ReactDOM.render(
-        <App></App>,
-        document.getElementById('content')
-    );
+document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('keyup', (e) => {
+        if (e.keyCode === 27) {
+            const appInfoDiv = document.getElementById('appDetails');
+            if (appInfoDiv) {
+                appInfoDiv.classList.remove('showing');
+            }
+        }
+    });
+
+    const root = document.getElementById('content');
+    ReactDOM.render(<App></App>, root);
 });
