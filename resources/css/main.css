@@ -16,6 +16,12 @@ button {
     border:1px solid #777;
 }
 
+#rvmInfo {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
 #content {
     position:relative;
     height: 100%;

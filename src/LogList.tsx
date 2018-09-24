@@ -19,6 +19,9 @@ interface LogListState {
     logs: LogFile[];
 }
 
+/* tslint:disable-next-line */
+const ButtonGroup = Button.Group;
+
 export class LogList extends React.Component<LogListProps, {}> {
 
     timer = 0;
@@ -28,7 +31,10 @@ export class LogList extends React.Component<LogListProps, {}> {
         { Header: 'Filename', headerStyle: { textAlign: "left" }, accessor: 'fileName', minWidth: 300},
         { Header: 'Size', accessor: 'formattedSize', maxWidth: 100, className: 'cell-center'},
         { Header: 'Actions', maxWidth: 100, className: 'cell-center', Cell: cellInfo => (
-            <Button type="primary" icon="exception" onClick={(e) => this.showLog(cellInfo.original)}></Button>
+            <ButtonGroup>
+                <Button type="primary" icon="exception" onClick={(e) => this.showLog(cellInfo.original)}></Button>
+                <Button type="primary" icon="mail" onClick={(e) => this.emailLog(cellInfo.original)}></Button>
+            </ButtonGroup>
         )}
     ];
 
@@ -67,6 +73,12 @@ export class LogList extends React.Component<LogListProps, {}> {
         const logWin: fin.OpenFinWindow = new fin.desktop.Window(opts, () => {
             logWin.getNativeWindow().postMessage(log.fileName, '*');
         }, (e) => console.error('error loading log file' + e));
+    }
+
+    emailLog(log:LogFile) {
+        // TODO somehow mail this thing?
+        // create hidden href with mailto proto and programitcally click it ?
+        console.log(`emailing log ${log.fileName}`)
     }
 
     private pollForLogs() {

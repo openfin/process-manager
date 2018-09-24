@@ -4,28 +4,7 @@ import { Button } from 'antd';
 
 import 'react-table/react-table.css';
 
-interface AppProcessInfo {
-    process: fin.ProcessInfo;
-    info: AppInfo;
-}
-
-interface AppInfo {
-    runtime: AppVersion;
-    manifestUrl: string;
-    manifest: Manifest;
-}
-
-interface AppVersion {
-    version: string;
-}
-
-interface Manifest {
-    startup_app: StartUpApp;
-}
-
-interface StartUpApp {
-    url: string;
-}
+import './interfaces'
 
 interface ProcessListProps {
     polling?: boolean;
