@@ -2,6 +2,7 @@ import * as React from 'react';
 import ReactTable from 'react-table';
 import { Button } from 'antd';
 
+import {formatBytes} from './utils';
 
 interface LogListProps {
     polling?: boolean;
@@ -25,7 +26,7 @@ const ButtonGroup = Button.Group;
 export class LogList extends React.Component<LogListProps, {}> {
 
     timer = 0;
-
+    
     columns = [
         { Header: 'Date/Time', headerStyle: { textAlign: "left" }, accessor: 'formattedDate', maxWidth: 250},
         { Header: 'Filename', headerStyle: { textAlign: "left" }, accessor: 'fileName', minWidth: 300},
@@ -119,7 +120,7 @@ export class LogList extends React.Component<LogListProps, {}> {
         const newInfo = {
             fileName: log.name || '',
             size: logSize,
-            formattedSize: logSize.toLocaleString(),
+            formattedSize: formatBytes(logSize, 1),
             date: logDate,
             formattedDate: logDate.toLocaleDateString('en-US', dateOpts) + ' ' + logDate.toLocaleTimeString('en-US', timeOpts)
         };

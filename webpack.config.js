@@ -14,13 +14,13 @@ module.exports = [
             filename: 'pack/main-react.js'
         },
         resolve: {
-            extensions: ['.tsx', '.js']
+            extensions: ['.tsx', '.js', '.ts']
         },
         devtool: 'inline-source-map',
         module: {
             rules: [
                 {
-                    test: /\.tsx$/,
+                    test: /\.tsx?$/,
                     loaders: ["ts-loader"],
                 },
                 {

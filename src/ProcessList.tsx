@@ -4,7 +4,9 @@ import { Button } from 'antd';
 
 import 'react-table/react-table.css';
 
-import './interfaces'
+import './interfaces';
+import {formatBytes} from './utils'
+
 
 interface ProcessListProps {
     polling?: boolean;
@@ -38,8 +40,7 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
         { Header: 'Runtime', accessor: 'info.runtime.version', maxWidth: 160, className: 'cell-center'},
         { Header: 'CPU', accessor: 'process.cpuUsage', maxWidth: 70, className: 'cell-center'},
         { Header: 'Mem', id: 'mem', maxWidth: 70, className: 'cell-center', accessor: (inf) => {
-            const mem = inf.process.workingSetSize||0.00;
-            return (mem/1000000).toFixed(2) + ' MB';
+            return formatBytes(inf.process.workingSetSize||0.00, 1);
         }},
         { Header: 'Actions', maxWidth: 220, className: 'cell-center', Cell: cellInfo => (
             <ButtonGroup>
