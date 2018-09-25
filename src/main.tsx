@@ -6,6 +6,7 @@ import { Tabs } from 'antd';
 import { ProcessList } from './ProcessList';
 import { LogList } from './LogList';
 import { ServiceList } from './ServiceList';
+import { WindowList } from './WindowList';
 
 import 'antd/dist/antd.less';
 
@@ -16,6 +17,7 @@ interface AppState {
     pollProcesses: boolean;
     pollLogs: boolean;
     pollServices: boolean;
+    pollWindows: boolean;
 }
 
 export class App extends React.Component<AppProps, {}> {
@@ -37,6 +39,11 @@ export class App extends React.Component<AppProps, {}> {
         } else {
             this.setState({pollLogs: false});
         }
+        if (key === "3") {
+            this.setState({pollWindows: true});
+        } else {
+            this.setState({pollWindows: false});
+        }
         if (key === "4") {
             this.setState({pollServices: true});
         } else {
@@ -49,7 +56,7 @@ export class App extends React.Component<AppProps, {}> {
         return <Tabs onChange={this.onTabChange.bind(this)} type="card">
             <TabPane tab="Applications" key="1"><ProcessList polling={(this.state as AppState).pollProcesses}></ProcessList></TabPane>
             <TabPane tab="Logs" key="2"><LogList polling={(this.state as AppState).pollLogs}></LogList></TabPane>
-            <TabPane tab="Windows" key="3">Windows</TabPane>
+            <TabPane tab="Windows" key="3"><WindowList polling={(this.state as AppState).pollWindows}></WindowList></TabPane>
             <TabPane tab="Services" key="4"><ServiceList polling={(this.state as AppState).pollServices}></ServiceList></TabPane>
         </Tabs>;
     }

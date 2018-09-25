@@ -18,7 +18,7 @@
   },
   "runtime": {
     "arguments": "",
-    "version": "9.61.33.32"
+    "version": "stable"
   },
   "splashScreenImage": "http://localhost:5040/img/after-image-splash.png"
 }
