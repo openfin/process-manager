@@ -51,7 +51,7 @@ button {
     color: #ddd;
 }
 
-#appDetails {
+#appDetails, #winDetails {
     display: none;
     position: absolute;
     white-space: pre;
@@ -61,7 +61,7 @@ button {
     padding: 5px;
 }
 
-#appDetails.showing {
+#appDetails.showing, #winDetails.showing {
     display: block;
     top: 20%;
     left: 20%;

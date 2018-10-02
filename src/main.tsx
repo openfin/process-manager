@@ -62,12 +62,16 @@ export class App extends React.Component<AppProps, {}> {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     document.addEventListener('keyup', (e) => {
         if (e.keyCode === 27) {
             const appInfoDiv = document.getElementById('appDetails');
             if (appInfoDiv) {
                 appInfoDiv.classList.remove('showing');
+            }
+            const winInfoDiv = document.getElementById('winDetails');
+            if (winInfoDiv) {
+                winInfoDiv.classList.remove('showing');
             }
         }
     });
@@ -81,4 +85,9 @@ document.addEventListener('DOMContentLoaded', () => {
             header.innerHTML = 'RVM: ' + info.version;
         }
     });
+
+    const monInfo = await fin.System.getMonitorInfo();
+    console.log(`got monitor info: ${JSON.stringify(monInfo,null, 4)}`);
+
+
 });

@@ -68,7 +68,6 @@ export class ServiceList extends React.Component<ServiceListProps, {}> {
                         newservices[newservices.length] = proc;
                     }
                 }
-                // TODO detect if serices list is different and update state
                 this.setState({services: newservices});
             });
         }

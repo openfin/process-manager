@@ -2,6 +2,7 @@
 interface AppProcessInfo {
     process: fin.ProcessInfo;
     info: AppInfo;
+    parentUUID: string;
 }
 
 interface AppInfo {
