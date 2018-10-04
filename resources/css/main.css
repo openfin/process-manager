@@ -15,6 +15,9 @@ button {
     border-radius: 2px;
     border:1px solid #777;
 }
+canvas {
+    border:1px solid #000;
+}
 
 #rvmInfo {
     position: absolute;

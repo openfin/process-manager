@@ -7,6 +7,7 @@ import { ProcessList } from './ProcessList';
 import { LogList } from './LogList';
 import { ServiceList } from './ServiceList';
 import { WindowList } from './WindowList';
+import { Workspace } from './Workspace'
 
 import 'antd/dist/antd.less';
 
@@ -18,37 +19,29 @@ interface AppState {
     pollLogs: boolean;
     pollServices: boolean;
     pollWindows: boolean;
+    contentHeight: number;
+    contentWidth: number;
 }
 
 export class App extends React.Component<AppProps, {}> {
 
     constructor(props) {
         super(props);
-        this.state = {pollProcesses: true};
+        this.state = {pollProcesses: true, contentHeight: 600, contentWidth: 800};
+    }
+
+    componentDidMount() {
+        const w = document.body.clientWidth;
+        const h = document.body.clientHeight;
+        this.setState({contentHeight: h-80, contentWidth: w-20});
+
     }
 
     onTabChange(key) {
-        // there's gotta be a better way, but always bigger fish to fry mmmmmmm...
-        if (key === "1") {
-            this.setState({pollProcesses: true});
-        } else {
-            this.setState({pollProcesses: false});
-        }
-        if (key === "2") {
-            this.setState({pollLogs: true});
-        } else {
-            this.setState({pollLogs: false});
-        }
-        if (key === "3") {
-            this.setState({pollWindows: true});
-        } else {
-            this.setState({pollWindows: false});
-        }
-        if (key === "4") {
-            this.setState({pollServices: true});
-        } else {
-            this.setState({pollServices: false});
-        }
+        this.setState({pollProcesses: key === "1"});
+        this.setState({pollLogs: key === "2"});
+        this.setState({pollWindows: (key === "3" || key === "4")});
+        this.setState({pollServices: key === "5"});
     }
 
     render() {
@@ -57,7 +50,8 @@ export class App extends React.Component<AppProps, {}> {
             <TabPane tab="Applications" key="1"><ProcessList polling={(this.state as AppState).pollProcesses}></ProcessList></TabPane>
             <TabPane tab="Logs" key="2"><LogList polling={(this.state as AppState).pollLogs}></LogList></TabPane>
             <TabPane tab="Windows" key="3"><WindowList polling={(this.state as AppState).pollWindows}></WindowList></TabPane>
-            <TabPane tab="Services" key="4"><ServiceList polling={(this.state as AppState).pollServices}></ServiceList></TabPane>
+            <TabPane tab="Workspace" key="4"><Workspace height={(this.state as AppState).contentHeight} width={(this.state as AppState).contentWidth} polling={(this.state as AppState).pollWindows}></Workspace></TabPane>
+            <TabPane tab="Services" key="5"><ServiceList polling={(this.state as AppState).pollServices}></ServiceList></TabPane>
         </Tabs>;
     }
 }
@@ -85,9 +79,4 @@ document.addEventListener('DOMContentLoaded', async () => {
             header.innerHTML = 'RVM: ' + info.version;
         }
     });
-
-    const monInfo = await fin.System.getMonitorInfo();
-    console.log(`got monitor info: ${JSON.stringify(monInfo,null, 4)}`);
-
-
 });
