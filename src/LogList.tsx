@@ -2,6 +2,7 @@ import * as React from 'react';
 import ReactTable from 'react-table';
 import { Button } from 'antd';
 
+import {formatBytes} from './utils';
 
 interface LogListProps {
     polling?: boolean;
@@ -19,16 +20,22 @@ interface LogListState {
     logs: LogFile[];
 }
 
+/* tslint:disable-next-line */
+const ButtonGroup = Button.Group;
+
 export class LogList extends React.Component<LogListProps, {}> {
 
     timer = 0;
-
+    
     columns = [
         { Header: 'Date/Time', headerStyle: { textAlign: "left" }, accessor: 'formattedDate', maxWidth: 250},
         { Header: 'Filename', headerStyle: { textAlign: "left" }, accessor: 'fileName', minWidth: 300},
         { Header: 'Size', accessor: 'formattedSize', maxWidth: 100, className: 'cell-center'},
         { Header: 'Actions', maxWidth: 100, className: 'cell-center', Cell: cellInfo => (
-            <Button type="primary" icon="exception" onClick={(e) => this.showLog(cellInfo.original)}></Button>
+            <ButtonGroup>
+                <Button type="primary" icon="exception" onClick={(e) => this.showLog(cellInfo.original)}></Button>
+                <Button type="primary" icon="mail" onClick={(e) => this.emailLog(cellInfo.original)}></Button>
+            </ButtonGroup>
         )}
     ];
 
@@ -69,6 +76,12 @@ export class LogList extends React.Component<LogListProps, {}> {
         }, (e) => console.error('error loading log file' + e));
     }
 
+    emailLog(log:LogFile) {
+        // TODO somehow mail this thing?
+        // create hidden href with mailto proto and programitcally click it ?
+        console.log(`emailing log ${log.fileName}`)
+    }
+
     private pollForLogs() {
         if (this.props.polling) {
             const logList:LogFile[] = [];
@@ -107,7 +120,7 @@ export class LogList extends React.Component<LogListProps, {}> {
         const newInfo = {
             fileName: log.name || '',
             size: logSize,
-            formattedSize: logSize.toLocaleString(),
+            formattedSize: formatBytes(logSize, 1),
             date: logDate,
             formattedDate: logDate.toLocaleDateString('en-US', dateOpts) + ' ' + logDate.toLocaleTimeString('en-US', timeOpts)
         };

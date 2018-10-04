@@ -4,28 +4,9 @@ import { Button } from 'antd';
 
 import 'react-table/react-table.css';
 
-interface AppProcessInfo {
-    process: fin.ProcessInfo;
-    info: AppInfo;
-}
+import './interfaces';
+import {formatBytes} from './utils'
 
-interface AppInfo {
-    runtime: AppVersion;
-    manifestUrl: string;
-    manifest: Manifest;
-}
-
-interface AppVersion {
-    version: string;
-}
-
-interface Manifest {
-    startup_app: StartUpApp;
-}
-
-interface StartUpApp {
-    url: string;
-}
 
 interface ProcessListProps {
     polling?: boolean;
@@ -52,15 +33,18 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
     columns = [
         { Header: 'ID', accessor: 'process.processId', maxWidth: 70, className: 'cell-center'},
         { Header: 'Application', id: 'name', headerStyle: { textAlign: "left" }, minWidth: 150, accessor: (inf) => {
-            return inf.process.uuid || inf.process.name || '';
+            if (inf.parentUUID!= '' && inf.parentUUID != inf.process.uuid) {
+                return ` - ${inf.process.uuid} (${inf.parentUUID})`;
+            } else {
+                return inf.process.uuid;
+            }
         }},
         { Header: 'URL', headerStyle: { textAlign: "left" }, accessor: 'info.manifest.startup_app.url', minWidth: 270},
         { Header: 'Manifest', headerStyle: { textAlign: "left" }, accessor: 'info.manifestUrl', minWidth: 270},
         { Header: 'Runtime', accessor: 'info.runtime.version', maxWidth: 160, className: 'cell-center'},
         { Header: 'CPU', accessor: 'process.cpuUsage', maxWidth: 70, className: 'cell-center'},
         { Header: 'Mem', id: 'mem', maxWidth: 70, className: 'cell-center', accessor: (inf) => {
-            const mem = inf.process.workingSetSize||0.00;
-            return (mem/1000000).toFixed(2) + ' MB';
+            return formatBytes(inf.process.workingSetSize||0.00, 1);
         }},
         { Header: 'Actions', maxWidth: 220, className: 'cell-center', Cell: cellInfo => (
             <ButtonGroup>
@@ -72,10 +56,7 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
     ];
 
     componentDidMount() {
-        this.timer = window.setInterval(
-            () => this.pollForApps(),
-            1000
-        );
+        this.timer = window.setInterval( () => this.pollForApps(), 1000 );
     }
     
     componentWillUnmount() {
@@ -118,11 +99,20 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
             fin.desktop.System.getProcessList(async (list) => {
                 for (let i = 0; i < list.length; i++) {
                     const proc = list[i];
+                    const app = fin.desktop.Application.wrap(proc.uuid||'');
                     const appInf = await new Promise((res, rej) => {
-                        fin.desktop.Application.wrap(proc.uuid || '').getInfo(res, rej);
+                        app.getInfo(res, rej);
                     });
+                    let appParent = '';
+                    try {
+                        appParent = await new Promise<string>((res, rej) => {
+                            app.getParentUuid(res, rej);
+                        });
+                    } catch(e) {
+                        //console.log('no parent app for: '+ proc.uuid);
+                    }
                     this.processCache[proc.uuid || ''] = appInf as AppInfo;
-                    procList[procList.length] = { process: proc, info: appInf as AppInfo};
+                    procList[procList.length] = { process: proc, info: appInf as AppInfo, parentUUID: appParent};
                 }
                 this.setState({data: procList});
             });

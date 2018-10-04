@@ -15,6 +15,15 @@ button {
     border-radius: 2px;
     border:1px solid #777;
 }
+canvas {
+    border:1px solid #000;
+}
+
+#rvmInfo {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
 
 #content {
     position:relative;
@@ -45,7 +54,7 @@ button {
     color: #ddd;
 }
 
-#appDetails {
+#appDetails, #winDetails {
     display: none;
     position: absolute;
     white-space: pre;
@@ -55,7 +64,7 @@ button {
     padding: 5px;
 }
 
-#appDetails.showing {
+#appDetails.showing, #winDetails.showing {
     display: block;
     top: 20%;
     left: 20%;
