@@ -67,11 +67,11 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
         const yScaleFactor = state.height / state.virtualHeight;
         let xoffset = 0;
         if (state.virtualLeft < 0) {
-            xoffset = state.virtualLeft * xScaleFactor;
+            xoffset = Math.abs(state.virtualLeft * xScaleFactor);
         }
         let yoffset = 0;
         if (state.virtualTop <0) {
-            yoffset = state.virtualTop * yScaleFactor;
+            yoffset = Math.abs(state.virtualTop * yScaleFactor);
         }
         if (ctx) {
             ctx.clearRect(0, 0, state.width, state.height);
@@ -94,8 +94,8 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
         }
         const scaledH = h * yscale;
         const scaledW = w * xscale;
-        const scaledT = Math.abs(props.top! * yscale);
-        const scaledL = Math.abs(props.left! * xscale);
+        const scaledT = props.top! * yscale;
+        const scaledL = props.left! * xscale;
 
         ctx.fillStyle = props.color;
         ctx.fillRect(scaledL+xoffset, scaledT+yoffset, scaledW, scaledH);
