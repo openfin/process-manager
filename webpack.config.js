@@ -46,7 +46,8 @@ module.exports = [
         },
         plugins: [
             new CopyWebpackPlugin([
-                { from: './resources' }
+                { from: './resources' },
+                { from: './app.json'}
             ])
         ]
     }
