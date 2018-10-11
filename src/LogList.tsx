@@ -28,13 +28,13 @@ export class LogList extends React.Component<LogListProps, {}> {
     timer = 0;
     
     columns = [
-        { Header: 'Date/Time', headerStyle: { textAlign: "left" }, accessor: 'formattedDate', maxWidth: 250},
+        { Header: 'Date/Time', headerStyle: { textAlign: "left" }, accessor: 'formattedDate', width: 180},
         { Header: 'Filename', headerStyle: { textAlign: "left" }, accessor: 'fileName', minWidth: 300},
-        { Header: 'Size', accessor: 'formattedSize', maxWidth: 100, className: 'cell-center'},
-        { Header: 'Actions', maxWidth: 100, className: 'cell-center', Cell: cellInfo => (
+        { Header: 'Size', accessor: 'formattedSize', width: 80, className: 'cell-center'},
+        { Header: 'Actions', width: 70, className: 'cell-center', Cell: cellInfo => (
             <ButtonGroup>
-                <Button type="primary" icon="exception" onClick={(e) => this.showLog(cellInfo.original)}></Button>
-                <Button type="primary" icon="mail" onClick={(e) => this.emailLog(cellInfo.original)}></Button>
+                <Button title="View Log" type="primary" icon="exception" onClick={(e) => this.showLog(cellInfo.original)}></Button>
+                <Button title="Email Log" type="primary" icon="mail" onClick={(e) => this.emailLog(cellInfo.original)}></Button>
             </ButtonGroup>
         )}
     ];
@@ -45,16 +45,13 @@ export class LogList extends React.Component<LogListProps, {}> {
     }
 
     componentDidMount() {
-        this.timer = window.setInterval(
-            () => this.pollForLogs(),
-            1000
-        );
+        this.pollForLogs();
+        this.timer = window.setInterval( () => this.pollForLogs(), 1000 );
     }
     
     componentWillUnmount() {
         window.clearInterval(this.timer);
     }
-
 
     render() {
         return <ReactTable

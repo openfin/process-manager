@@ -22,6 +22,7 @@ interface windowDetails extends fin.WindowDetails {
     parentUUID: string;
     childCount: number;
     windowInfo: windowInfo;
+    showing: boolean;
 }
 
 interface windowInfo {
@@ -45,37 +46,44 @@ export class WindowList extends React.Component<WindowListProps, {}> {
     }
 
     columns = [
-        { Header: 'Window', id: 'name', headerStyle: { textAlign: "left" }, accessor: (inf) => {
+        { Header: 'Window', id: 'name', minWidth: 270, headerStyle: { textAlign: "left" }, accessor: (inf) => {
             if (inf.parentName) {
                 return ` - ${inf.name} (${inf.parentName})`;
+            } else if (inf.name && inf.name != '') {
+                return inf.name;
             } else {
-                return inf.name || '';
+                return inf.uuid;
             }
         }},
-        { Header: 'URL', headerStyle: { textAlign: "left" }, accessor: 'url'},
-        { Header: 'Position', headerStyle: { textAlign: "left" }, id: 'position', accessor: (inf) => {
+        { Header: 'URL', minWidth: 270, headerStyle: { textAlign: "left" }, accessor: 'url'},
+        { Header: 'Showing', width: 80, id: 'showing', accessor: (inf) => {
+            if (inf.showing) {
+                return 'Yes';
+            } else {
+                return 'No';
+            }
+        }},
+        { Header: 'Position', width: 220, id: 'position', accessor: (inf) => {
             let sizeInfo = '';
             if (inf.windowInfo && inf.windowInfo.size && inf.windowInfo.position) {
                 sizeInfo += `${inf.windowInfo.size} at ${inf.windowInfo.position}`;
             }
             return sizeInfo;
         }},
-        { Header: 'Children', maxWidth: 120, className: 'cell-center', accessor: 'childCount'},
-        { Header: 'Actions', maxWidth: 180, className: 'cell-center', Cell: cellInfo => (
+        { Header: 'Children', width: 80, className: 'cell-center', accessor: 'childCount'},
+        { Header: 'Actions', width: 150, className: 'cell-center', Cell: cellInfo => (
             <ButtonGroup>
-                <Button type="primary" icon="code" onClick={(e) => this.launchDebugger(cellInfo.original)}></Button>
-                <Button type="primary" icon="medicine-box" onClick={(e) => this.centerWindow(cellInfo.original)}></Button>
-                <Button type="primary" icon="info-circle" onClick={(e) => this.showWindowInfo(cellInfo.original)}></Button>
-                <Button type="primary" icon="close-circle" onClick={(e) => this.closeWindow(cellInfo.original)}></Button>
+                <Button title="Launch Debugger" type="primary" icon="code" onClick={(e) => this.launchDebugger(cellInfo.original)}></Button>
+                <Button title="Rescue Offscreen Window" type="primary" icon="medicine-box" onClick={(e) => this.centerWindow(cellInfo.original)}></Button>
+                <Button title="Show Window Info" type="primary" icon="info-circle" onClick={(e) => this.showWindowInfo(cellInfo.original)}></Button>
+                <Button title="Close Window" type="primary" icon="close-circle" onClick={(e) => this.closeWindow(cellInfo.original)}></Button>
             </ButtonGroup>
         )}
     ];
 
     componentDidMount() {
-        this.timer = window.setInterval(
-            () => this.pollForWindows(),
-            1000
-        );
+        this.pollForWindows();
+        this.timer = window.setInterval( () => this.pollForWindows(), 1000 );
     }
     
     componentWillUnmount() {
@@ -138,6 +146,7 @@ export class WindowList extends React.Component<WindowListProps, {}> {
         if (this.props.polling) {
             const winList:windowDetails[] = [];
             fin.desktop.System.getAllWindows(async (list) => {
+
                 const allWins = list.map(w => [w.mainWindow!].concat(w.childWindows!).map(cw => 
                     Object.assign(cw, {
                         uuid: w.uuid!, 
@@ -146,19 +155,22 @@ export class WindowList extends React.Component<WindowListProps, {}> {
                         parentName: '', 
                         parentUUID: '', 
                         childCount: w.childWindows!.length,
-                        windowInfo: this.getWindowPositionInfo(cw)
+                        windowInfo: this.getWindowPositionInfo(cw),
+                        showing: true
                     }))
                 ).reduce( (p,c) => p.concat(c), []);
+
                 for (let w of allWins) {
                     const fInfo:fin.EntityInfo = await new Promise<fin.EntityInfo>(r => fin.desktop.Frame.wrap(w.uuid!, w.name!).getInfo(r));
                     w.parentName = fInfo.parent.name;
                     w.parentUUID = fInfo.parent.uuid;
-                    const ofWin = fin.desktop.Window.wrap(w.uuid!, w.name!);
-                    // const winBounds = await new Promise((res, rej) => {
-                    //     const win = fin.desktop.Window.wrap(w.uuid!, w.name!);
-                    // });
+                    const ofWin = await fin.Window.wrap(w);
+                    const info = await ofWin.getInfo();
+                    w.url = info.url;
+                    w.showing = await ofWin.isShowing();
                     winList.push(w);
                 }
+
                 this.setState({data: winList});
             });
         }

@@ -23,6 +23,17 @@ interface AppState {
     contentWidth: number;
 }
 
+const hideInfoWindows = () => {
+    const appInfoDiv = document.getElementById('appDetails');
+    if (appInfoDiv) {
+        appInfoDiv.classList.remove('showing');
+    }
+    const winInfoDiv = document.getElementById('winDetails');
+    if (winInfoDiv) {
+        winInfoDiv.classList.remove('showing');
+    }
+}
+
 export class App extends React.Component<AppProps, {}> {
 
     constructor(props) {
@@ -38,6 +49,7 @@ export class App extends React.Component<AppProps, {}> {
     }
 
     onTabChange(key) {
+        hideInfoWindows();
         this.setState({pollProcesses: key === "1"});
         this.setState({pollLogs: key === "2"});
         this.setState({pollWindows: (key === "3" || key === "4")});
@@ -57,16 +69,10 @@ export class App extends React.Component<AppProps, {}> {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+
     document.addEventListener('keyup', (e) => {
         if (e.keyCode === 27) {
-            const appInfoDiv = document.getElementById('appDetails');
-            if (appInfoDiv) {
-                appInfoDiv.classList.remove('showing');
-            }
-            const winInfoDiv = document.getElementById('winDetails');
-            if (winInfoDiv) {
-                winInfoDiv.classList.remove('showing');
-            }
+            hideInfoWindows();
         }
     });
 
@@ -78,5 +84,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (header) {
             header.innerHTML = 'RVM: ' + info.version;
         }
+    });
+
+    // diagnostic events - console.log'ed for now
+    fin.System.addListener('application-started', (evt) => {
+        console.log(`application-started: ${JSON.stringify(evt, null, 4)}`);
+    });
+
+    fin.System.addListener('monitor-info-changed', (evt) => {
+        console.log(`monitor-info-changed: ${JSON.stringify(evt, null, 4)}`);
+    });
+
+    fin.System.addListener('application-closed', (evt) => {
+        console.log(`application-closed: ${JSON.stringify(evt, null, 4)}`);
+    });
+
+    fin.System.addListener('window-created', (evt) => {
+        console.log(`window-created: ${JSON.stringify(evt, null, 4)}`);
     });
 });

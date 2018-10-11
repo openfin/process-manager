@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { MonitorInfo } from 'openfin/_v2/api/system/monitor';
 
 interface WorkspaceProps {
     polling?: boolean;
@@ -14,11 +15,21 @@ interface WorkspaceState {
     virtualLeft: number;
     virtualWidth: number;
     data: windowInfo[];
+    monitors: monitorInfo[];
+}
+
+interface monitorInfo {
+    top: number;
+    left: number;
+    bottom: number;
+    right: number;
+    name: string;
 }
 
 interface windowInfo extends fin.WindowInfo {
     color: string;
     area: number;
+    showing: boolean;
 }
 
 export class Workspace extends React.Component<WorkspaceProps, {}> {
@@ -38,25 +49,29 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
     }
 
     componentDidMount() {
+        this.pollForWorkspaces()
+        this.timer = window.setInterval( () => this.pollForWorkspaces(), 1000 );
+
         this.setSize();
         window.addEventListener('resize', () => {
-            console.log('resizing');
             this.setSize();
         });
-        this.timer = window.setInterval(
-            () => this.pollForWorkspaces(),
-            1000
-        );
     }
 
     setSize() {
-        const w = document.body.clientWidth;
-        const h = document.body.clientHeight;
-        this.setState({height: h-80, width: w-20});
+        const w = document.body.clientWidth-20;
+        const h = document.body.clientHeight-80;
+
+        // TODO: constrain aspect ratio
+        const vaspect = (this.state as WorkspaceState).virtualWidth / (this.state as WorkspaceState).virtualHeight;
+        const caspect = w / h;
+        console.log(`virtual aspect ratio: ${vaspect}, canvas aspect ratio: ${caspect}`);
+        
+        this.setState({height: h, width: w});
     }
 
     componentWillUnmount() {
-        window.clearInterval(this.timer);
+        window.clearInterval(this.timer);   
     }
 
     updateCanvas() {
@@ -70,7 +85,7 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
             xoffset = Math.abs(state.virtualLeft * xScaleFactor);
         }
         let yoffset = 0;
-        if (state.virtualTop <0) {
+        if (state.virtualTop < 0) {
             yoffset = Math.abs(state.virtualTop * yScaleFactor);
         }
         if (ctx) {
@@ -81,12 +96,18 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
             });
             for (let i=0; i<winData.length; i++) {
                 const winInfo = winData[i];
-                this.makeRect(ctx, winInfo, xScaleFactor, xoffset, yScaleFactor, yoffset );
-            }    
+                if (winInfo.showing === true) {
+                    this.makeWindowRect(ctx, winInfo, xScaleFactor, xoffset, yScaleFactor, yoffset );
+                }
+            }
+            for (let j=0; j<(this.state as WorkspaceState).monitors.length; j++) {
+                const monInfo = (this.state as WorkspaceState).monitors[j];
+                this.makeMonitorRect(ctx, monInfo, j, xScaleFactor, xoffset, yScaleFactor, yoffset);
+            }
         }
     }
     
-    makeRect(ctx:CanvasRenderingContext2D, props:windowInfo, xscale: number, xoffset:number, yscale: number, yoffset: number) {
+    makeWindowRect(ctx:CanvasRenderingContext2D, props:windowInfo, xscale: number, xoffset:number, yscale: number, yoffset: number) {
         let h, w = 0;
         if (props.right && props.bottom) {
             h = props.bottom - props.top!;
@@ -107,7 +128,25 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
         ctx.fillText(props.name!, scaledL+xoffset+5, scaledT+yoffset+15, scaledW);
     }
 
-    // 30 random hues with step of 12 degrees
+    makeMonitorRect(ctx:CanvasRenderingContext2D, props:monitorInfo, monNumber: number, xscale: number, xoffset:number, yscale: number, yoffset: number) {
+        const h = props.bottom - props.top;
+        const w = props.right - props.left;
+        const scaledH = h * yscale;
+        const scaledW = w * xscale;
+        const scaledT = props.top * yscale;
+        const scaledL = props.left * xscale;
+
+        ctx.strokeStyle = "#000000";
+        ctx.lineWidth   = 1;
+        ctx.setLineDash([5,2,3]);
+        ctx.strokeRect(scaledL+xoffset, scaledT+yoffset, scaledW, scaledH);
+        ctx.setLineDash([0]);
+
+        ctx.fillStyle = "#000000";
+        ctx.font = '12px Arial';
+        ctx.fillText(props.name, scaledL+xoffset+5, scaledT+yoffset+15, scaledW);
+    }
+
     getRandomFillColor(uuid: string, name: string) {
         const key = uuid + '__' + name;
         const color = this.colorCache[key];
@@ -135,31 +174,54 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
         return (win.right! - win.left!)*(win.bottom! - win.top!);
     }
 
+    getAllMonitors(mons: MonitorInfo): monitorInfo[] {
+        const infos:monitorInfo[] = [];
+        const pInfo = mons.primaryMonitor.monitorRect;
+        infos[0] = { "top": pInfo.top, left: pInfo.left, bottom: pInfo.bottom, right: pInfo.right, name: 'Main Monitor'};
+        for (let i=0; i<mons.nonPrimaryMonitors.length; i++) {
+            const nonPInfo = mons.nonPrimaryMonitors[i].monitorRect;
+            infos[infos.length] = { "top": nonPInfo.top, left: nonPInfo.left, bottom: nonPInfo.bottom, right: nonPInfo.right, name: `Monitor ${i+1}`};
+        }
+        return infos;
+    }
+
     private async pollForWorkspaces() {
         if (this.props.polling) {
+            // monitor stuff
             const monInfo = await fin.System.getMonitorInfo();
+            const mons = this.getAllMonitors(monInfo);
+            this.setState({
+                virtualTop: monInfo.virtualScreen.top,
+                virtualLeft: monInfo.virtualScreen.left,
+                virtualHeight: monInfo.virtualScreen.bottom - monInfo.virtualScreen.top, 
+                virtualWidth: monInfo.virtualScreen.right - monInfo.virtualScreen.left,
+                monitors: mons
+            });
+            // window stuff
             const winList:fin.WindowInfo[] = [];
-            fin.desktop.System.getAllWindows(async (list) => {
+             fin.desktop.System.getAllWindows(async (list) => {
                 const allWins = list.map(w => [w.mainWindow!].concat(w.childWindows!).map(cw => 
                     Object.assign(cw, {
                         uuid: w.uuid!,
                         parentName: '',
                         parentUUID: '',
                         color: this.getRandomFillColor(w.uuid!, cw.name!),
-                        area: 0
+                        area: 0,
+                        showing: false
                     }))
                 ).reduce( (p,c) => p.concat(c), []);
                 for (let w of allWins) {
                     const fInfo:fin.EntityInfo = await new Promise<fin.EntityInfo>(r => fin.desktop.Frame.wrap(w.uuid!, w.name!).getInfo(r));
                     w.parentName = fInfo.parent.name;
                     w.parentUUID = fInfo.parent.uuid;
+                    const ofWin = await fin.Window.wrap(w);
+                    const info = await ofWin.getInfo();
+                    w.showing = await ofWin.isShowing();
                     w.area = this.calcWindowArea(w);
                     winList.push(w);
                 }
                 this.setState({
-                    data: winList, 
-                    virtualHeight: monInfo.virtualScreen.bottom - monInfo.virtualScreen.top, 
-                    virtualWidth: monInfo.virtualScreen.right - monInfo.virtualScreen.left
+                    data: winList
                 });
             });
             this.updateCanvas();

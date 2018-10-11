@@ -1,6 +1,6 @@
-const KB = 1000000;
-const MB = KB * 1000;
-const GB = MB * 1000;
+const KB = 1024;
+const MB = KB * 1024;
+const GB = MB * 1024;
 
 export const formatBytes = (size:number, places: number) => {
     if (size > GB) {
