@@ -49,17 +49,27 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
     }
 
     componentDidMount() {
-        this.pollForWorkspaces()
-        this.timer = window.setInterval( () => this.pollForWorkspaces(), 1000 );
+        this.startPolling();
 
         this.setSize();
         let resizeTimeout = 0;
         window.addEventListener('resize', () => {
+            this.stopPolling();
             clearTimeout(resizeTimeout);
             resizeTimeout = window.setTimeout(()=> {
                 this.setSize()
+                this.startPolling();
             }, 100);
         });
+    }
+
+    startPolling() {
+        this.pollForWorkspaces()
+        this.timer = window.setInterval( () => this.pollForWorkspaces(), 1000 );
+    }
+
+    stopPolling() {
+        window.clearInterval(this.timer);
     }
 
     setSize() {
@@ -76,7 +86,7 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
     }
 
     componentWillUnmount() {
-        window.clearInterval(this.timer);
+        this.stopPolling();
     }
 
     updateCanvas() {
