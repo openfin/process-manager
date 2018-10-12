@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>OpenFin After Image</title>
+    <title>OpenFin Process Manager: </title>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const logger = document.querySelector('#logger');
@@ -9,6 +9,7 @@
                 window.addEventListener("message", (e) => {
                     const filename = e.data;
                     if (filename) {
+                        document.title += filename;
                         fin.desktop.System.getLog(filename, (entries) => {
                             logger.innerHTML = entries;
                         }, (error) => console.log("Error creating log window:", error));

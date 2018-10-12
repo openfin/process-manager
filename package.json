@@ -1,7 +1,7 @@
 {
   "name": "process-manager",
   "version": "1.0.0",
-  "description": "Process manager built on OpenFin",
+  "description": "OpenFin Process Manager",
   "dependencies": {
     "antd": "^3.8.2",
     "react": "^16.4.2",
