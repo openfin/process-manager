@@ -45,6 +45,11 @@ canvas {
     text-align: center;
 }
 
+#workspace {
+    display: block;
+    margin: auto;
+}
+
 #logger {
     font-size: 12px;
     white-space: pre;

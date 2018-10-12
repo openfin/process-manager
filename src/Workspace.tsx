@@ -63,6 +63,14 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
         });
     }
 
+    componentWillUnmount() {
+        this.stopPolling();
+    }
+
+    render() {
+        return <canvas id="workspace" ref="canvas" width={(this.state as WorkspaceState).width} height={(this.state as WorkspaceState).height} />;
+    }
+
     startPolling() {
         this.pollForWorkspaces()
         this.timer = window.setInterval( () => this.pollForWorkspaces(), 1000 );
@@ -83,10 +91,6 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
             w = h * vaspect;
         }        
         this.setState({height: h, width: w});
-    }
-
-    componentWillUnmount() {
-        this.stopPolling();
     }
 
     updateCanvas() {
@@ -179,10 +183,6 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
         var n = 0|((Math.random() * r) + this.brightness);
         var s = n.toString(16);
         return (s.length==1) ? '0'+s : s;
-    }
-
-    render() {
-        return <canvas ref="canvas" width={(this.state as WorkspaceState).width} height={(this.state as WorkspaceState).height} />;
     }
 
     calcWindowArea(win:windowInfo) {
