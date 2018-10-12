@@ -53,25 +53,30 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
         this.timer = window.setInterval( () => this.pollForWorkspaces(), 1000 );
 
         this.setSize();
+        let resizeTimeout = 0;
         window.addEventListener('resize', () => {
-            this.setSize();
+            clearTimeout(resizeTimeout);
+            resizeTimeout = window.setTimeout(()=> {
+                this.setSize()
+            }, 100);
         });
     }
 
     setSize() {
-        const w = document.body.clientWidth-20;
-        const h = document.body.clientHeight-80;
-
-        // TODO: constrain aspect ratio
+        let w = document.body.clientWidth-20;
+        let h = document.body.clientHeight-80;
         const vaspect = (this.state as WorkspaceState).virtualWidth / (this.state as WorkspaceState).virtualHeight;
         const caspect = w / h;
-        console.log(`virtual aspect ratio: ${vaspect}, canvas aspect ratio: ${caspect}`);
-        
+        if ( vaspect > caspect ) {
+            h = w / vaspect;
+        } else if ( vaspect < caspect ) {
+            w = h * vaspect;
+        }        
         this.setState({height: h, width: w});
     }
 
     componentWillUnmount() {
-        window.clearInterval(this.timer);   
+        window.clearInterval(this.timer);
     }
 
     updateCanvas() {
