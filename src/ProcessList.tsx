@@ -23,6 +23,15 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
     timer = 0;
     processCache: {[key:string]:AppInfo} = {};
 
+    static closeAllApps() {
+        fin.desktop.System.getProcessList(async (list) => {
+            for (let i = 0; i < list.length; i++) {
+                const proc = list[i];
+                const app = fin.desktop.Application.wrap(proc.uuid||'').close();
+            }
+        });
+    }
+
     constructor(props) {
         super(props);
         this.state = {
@@ -56,12 +65,11 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
     ];
 
     componentDidMount() {
-        this.pollForApps();
-        this.timer = window.setInterval( () => this.pollForApps(), 1000 );
+        this.startPolling();
     }
     
     componentWillUnmount() {
-        window.clearInterval(this.timer);
+        this.stopPolling();
     }
 
     render() {
@@ -75,6 +83,15 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
             }}
             className="-striped -highlight"
        />;
+    }
+
+    startPolling() {
+        this.pollForApps();
+        this.timer = window.setInterval( () => this.pollForApps(), 1000 );
+    }
+
+    stopPolling() {
+        window.clearInterval(this.timer);
     }
 
     launchDebugger(proc):void {

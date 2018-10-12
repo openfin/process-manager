@@ -212,6 +212,8 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
                 virtualWidth: monInfo.virtualScreen.right - monInfo.virtualScreen.left,
                 monitors: mons
             });
+            this.setSize();
+            
             // window stuff
             const winList:fin.WindowInfo[] = [];
              fin.desktop.System.getAllWindows(async (list) => {
