@@ -28,7 +28,7 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
             for (let i = 0; i < list.length; i++) {
                 const uuid = list[i].uuid||'';
                 if (uuid !== '' && uuid !== 'process-manager') {
-                    fin.desktop.Application.wrap(uuid).close();
+                    fin.desktop.Application.wrap(uuid).close(true);
                 }
             }
         });
