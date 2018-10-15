@@ -39,6 +39,13 @@ body {
     padding: 12px 7px;
 }
 
+.modalInput {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 5px 2px;
+}
+
 #tabExtras {
     margin-right: 10px;
 }

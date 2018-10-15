@@ -24,7 +24,6 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
     processCache: {[key:string]:AppInfo} = {};
 
     static closeAllApps() {
-        console.log('closing all apps except us.');
         fin.desktop.System.getProcessList(async (list) => {
             for (let i = 0; i < list.length; i++) {
                 const uuid = list[i].uuid||'';
