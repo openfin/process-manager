@@ -1,8 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { Tabs } from 'antd';
-import { Button } from 'antd';
+import { Tabs, Menu, Dropdown, Icon, Button, Modal } from 'antd';
 
 import { ProcessList } from './ProcessList';
 import { LogList } from './LogList';
@@ -14,6 +13,7 @@ import 'antd/dist/antd.less';
 
 /* tslint:disable-next-line */
 const ButtonGroup = Button.Group;
+const confirm = Modal.confirm;
 
 interface AppProps {
     
@@ -31,7 +31,6 @@ interface AppState {
 }
 
 export class App extends React.Component<AppProps, {}> {
-
 
     constructor(props) {
         super(props);
@@ -78,21 +77,36 @@ export class App extends React.Component<AppProps, {}> {
     getExtras(key:string) {
         const defaultExtras = <span id="rvmInfo">{(this.state as AppState).rvmInfo}</span>
         if (key === "1") {
+            const procMenu = <Menu>
+                <Menu.Item key="0">
+                    <a onClick={(e) => this.openApp()}><Icon type="rocket" /> Launch Application</a>
+                </Menu.Item>
+                <Menu.Item key="1">
+                    <a onClick={(e) => this.closeAllApps()}><Icon type="delete" /> Close All Applications</a>
+                </Menu.Item>
+            </Menu>;
             return <div id="tabExtras">
-            <ButtonGroup>
-                <Button title="Open Application" type="default" icon="plus-square" onClick={(e) => this.closeAllApps()}></Button>
-                <Button title="Close All Applications" type="danger" icon="close-square" onClick={(e) => this.openApp()}></Button>
-            </ButtonGroup>
-            {defaultExtras}
-            </div>
+                <Dropdown overlay={procMenu} trigger={['click']}>
+                    <Button type="default" icon="setting"></Button>
+                </Dropdown>
+                {defaultExtras}
+            </div>;
         }
         return <div id="tabExtras">{defaultExtras}</div>;
     }
 
     closeAllApps() {
-        console.log('close all apps not yet implemented');
-        // prompt
-        //ProcessList.closeAllApps();
+        confirm({
+            title: 'Close ALL Applications?',
+            content: 'Click OK to close ALL running applications.',
+            onOk() {
+              return new Promise((resolve, reject) => {
+                    ProcessList.closeAllApps();
+                    resolve();
+                }).catch(() => console.log('Error closing all applications!'));
+            },
+            onCancel() {},
+        });
     }
 
     openApp() {

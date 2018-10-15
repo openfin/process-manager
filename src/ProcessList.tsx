@@ -24,10 +24,13 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
     processCache: {[key:string]:AppInfo} = {};
 
     static closeAllApps() {
+        console.log('closing all apps except us.');
         fin.desktop.System.getProcessList(async (list) => {
             for (let i = 0; i < list.length; i++) {
-                const proc = list[i];
-                const app = fin.desktop.Application.wrap(proc.uuid||'').close();
+                const uuid = list[i].uuid||'';
+                if (uuid !== '' && uuid !== 'process-manager') {
+                    fin.desktop.Application.wrap(uuid).close();
+                }
             }
         });
     }
