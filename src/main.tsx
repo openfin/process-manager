@@ -50,6 +50,7 @@ export class App extends React.Component<AppProps, {}> {
         this.state = {currentKey: "1", pollProcesses: true, contentHeight: 600, contentWidth: 800, rvmInfo: 'RVM v0.0.0', openAppModalVisible: false};
         fin.desktop.System.getRvmInfo( (info) => {
             this.setState({ rvmInfo: 'RVM: ' + info.version});
+            this.setState({ extras: this.getExtras((this.state as AppState).currentKey)});
         });
     }
 
