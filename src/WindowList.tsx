@@ -46,24 +46,27 @@ export class WindowList extends React.Component<WindowListProps, {}> {
     }
 
     columns = [
-        { Header: 'Window', id: 'name', minWidth: 270, headerStyle: { textAlign: "left" }, accessor: (inf) => {
-            if (inf.parentName) {
-                return ` - ${inf.name} (${inf.parentName})`;
-            } else if (inf.name && inf.name != '') {
-                return inf.name;
-            } else {
-                return inf.uuid;
-            }
-        }},
-        { Header: 'URL', minWidth: 270, headerStyle: { textAlign: "left" }, accessor: 'url'},
-        { Header: 'Showing', width: 80, id: 'showing', accessor: (inf) => {
+        { 
+            Header: 'Window', id: 'name', minWidth: 200, headerStyle: { textAlign: "left" }, accessor: (inf) => {
+                if (inf.parentName) {
+                    return ` - ${inf.name} (${inf.parentName})`;
+                } else if (inf.name && inf.name != '') {
+                    return inf.name;
+                } else {
+                    return inf.uuid;
+                }
+            },
+            Cell: c => <div className="cell-overflow" title={c.value}>{c.value}</div>
+        },
+        { Header: 'URL', minWidth: 200, headerStyle: { textAlign: "left" }, accessor: 'url', Cell: c => <div className="cell-overflow" title={c.value}>{c.value}</div>},
+        { Header: 'Showing', width: 80, id: 'showing', className: 'cell-center', accessor: (inf) => {
             if (inf.showing) {
                 return 'Yes';
             } else {
                 return 'No';
             }
         }},
-        { Header: 'Position', width: 220, id: 'position', accessor: (inf) => {
+        { Header: 'Position', width: 220, id: 'position', className: 'cell-center', accessor: (inf) => {
             let sizeInfo = '';
             if (inf.windowInfo && inf.windowInfo.size && inf.windowInfo.position) {
                 sizeInfo += `${inf.windowInfo.size} at ${inf.windowInfo.position}`;
@@ -133,11 +136,11 @@ export class WindowList extends React.Component<WindowListProps, {}> {
     getWindowPositionInfo(win:fin.WindowInfo) {
         const info = {
             size: '',
-            position: `${win.top}, ${win.left}`,
+            position: `(${win.top},${win.left})`,
             monitor: ''
         };
         if (typeof win.top !== 'undefined' && typeof win.bottom !== 'undefined' && typeof win.left !== 'undefined' && typeof win.right !== 'undefined') {
-            info.size = `${win.right - win.left}w x ${win.bottom - win.top}h`;
+            info.size = `${win.right - win.left}w${win.bottom - win.top}h`;
         }
         return info;
     }

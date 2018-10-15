@@ -41,15 +41,18 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
 
     columns = [
         { Header: 'ID', accessor: 'process.processId', width: 70, className: 'cell-center'},
-        { Header: 'Application', id: 'name', headerStyle: { textAlign: "left" }, minWidth: 150, accessor: (inf) => {
-            if (inf.parentUUID!= '' && inf.parentUUID != inf.process.uuid) {
-                return ` - ${inf.process.uuid} (${inf.parentUUID})`;
-            } else {
-                return inf.process.uuid;
-            }
-        }},
-        { Header: 'URL', headerStyle: { textAlign: "left" }, accessor: 'info.manifest.startup_app.url', minWidth: 270},
-        { Header: 'Manifest', headerStyle: { textAlign: "left" }, accessor: 'info.manifestUrl', minWidth: 270},
+        { 
+            Header: 'Application', id: 'name', headerStyle: { textAlign: "left" }, minWidth: 150, accessor: (inf) => {
+                if (inf.parentUUID!= '' && inf.parentUUID != inf.process.uuid) {
+                    return ` - ${inf.process.uuid} (${inf.parentUUID})`;
+                } else {
+                    return inf.process.uuid;
+                }
+            },
+            Cell: c => <div className="cell-overflow" title={c.value}>{c.value}</div>
+        },
+        { Header: 'URL', headerStyle: { textAlign: "left" }, accessor: 'info.manifest.startup_app.url', minWidth: 200, Cell: c => <div className="cell-overflow"title={c.value}>{c.value}</div>},
+        { Header: 'Manifest', headerStyle: { textAlign: "left" }, accessor: 'info.manifestUrl', minWidth: 200, Cell: c => <div className="cell-overflow"title={c.value}>{c.value}</div>},
         { Header: 'Runtime', accessor: 'info.runtime.version', width: 100, className: 'cell-center'},
         { Header: 'CPU', accessor: 'process.cpuUsage', width: 80, className: 'cell-center'},
         { Header: 'Mem', id: 'mem', width: 80, className: 'cell-center', accessor: (inf) => {

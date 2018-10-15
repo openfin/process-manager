@@ -10,22 +10,6 @@ body {
     height: 100%;
     overflow: hidden;
 }
-button {
-    border: 1px solid #afafaf;
-    border-radius: 2px;
-    border:1px solid #777;
-}
-canvas {
-    border:1px solid #000;
-}
-
-#tabExtras {
-    margin-right: 10px;
-}
-
-#rvmInfo {
-    padding-left: 5px;
-}
 
 #content {
     position:relative;
@@ -46,10 +30,27 @@ canvas {
 .cell-center {
     text-align: center;
 }
+.cell-overflow {
+    width:100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.rt-tr .rt-td:not(:last-child) {
+    padding: 12px 7px;
+}
+
+#tabExtras {
+    margin-right: 10px;
+}
+
+#rvmInfo {
+    padding-left: 5px;
+}
 
 #workspace {
     display: block;
     margin: auto;
+    border:1px solid #000;
 }
 
 #logger {
