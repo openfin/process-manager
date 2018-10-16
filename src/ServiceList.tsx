@@ -49,7 +49,7 @@ export class ServiceList extends React.Component<ServiceListProps, {}> {
         return <ReactTable
             data={(this.state as ProcessInfoState).messages}
             columns={this.columns}
-            minRows={5}
+            minRows={15}
             showPagination={false}
             style={{
                 height: "calc(100vh - 79px)"

@@ -23,6 +23,12 @@ body {
 .ant-tabs-content {
     padding: 0 10px;
 }
+.ant-tabs-nav-container {
+    font-size: 13px;
+}
+.ant-dropdown-menu-item {
+    font-size: 13px;
+}
 
 .cell-right {
     text-align: right;
@@ -35,8 +41,21 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.rt-table {
+    font-size: 12px;
+}
 .rt-tr .rt-td:not(:last-child) {
-    padding: 12px 7px;
+    padding: 8px 5px;
+}
+.rt-tr .rt-td:last-child {
+    padding: 5px;
+}
+
+.rt-tr .rt-td:last-child button.ant-btn {
+    font-size: 11px;
+    padding: 4px 8px;
+    height: 24px;
+    line-height: 14px;
 }
 
 .modalInput {
@@ -52,6 +71,7 @@ body {
 
 #rvmInfo {
     padding-left: 5px;
+    font-size: 13px;
 }
 
 #workspace {

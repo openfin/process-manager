@@ -59,22 +59,22 @@ export class WindowList extends React.Component<WindowListProps, {}> {
             Cell: c => <div className="cell-overflow" title={c.value}>{c.value}</div>
         },
         { Header: 'URL', minWidth: 200, headerStyle: { textAlign: "left" }, accessor: 'url', Cell: c => <div className="cell-overflow" title={c.value}>{c.value}</div>},
-        { Header: 'Showing', width: 80, id: 'showing', className: 'cell-center', accessor: (inf) => {
+        { Header: 'Showing', width: 60, id: 'showing', className: 'cell-center', accessor: (inf) => {
             if (inf.showing) {
                 return 'Yes';
             } else {
                 return 'No';
             }
         }},
-        { Header: 'Position', width: 220, id: 'position', className: 'cell-center', accessor: (inf) => {
+        { Header: 'Position', width: 180, id: 'position', className: 'cell-center', accessor: (inf) => {
             let sizeInfo = '';
             if (inf.windowInfo && inf.windowInfo.size && inf.windowInfo.position) {
                 sizeInfo += `${inf.windowInfo.size} at ${inf.windowInfo.position}`;
             }
             return sizeInfo;
         }},
-        { Header: 'Children', width: 80, className: 'cell-center', accessor: 'childCount'},
-        { Header: 'Actions', width: 150, className: 'cell-center', Cell: cellInfo => (
+        { Header: 'Children', width: 60, className: 'cell-center', accessor: 'childCount'},
+        { Header: 'Actions', width: 135, className: 'cell-center', Cell: cellInfo => (
             <ButtonGroup>
                 <Button title="Launch Debugger" type="primary" icon="code" onClick={(e) => this.launchDebugger(cellInfo.original)}></Button>
                 <Button title="Rescue Offscreen Window" type="primary" icon="medicine-box" onClick={(e) => this.centerWindow(cellInfo.original)}></Button>
@@ -97,7 +97,7 @@ export class WindowList extends React.Component<WindowListProps, {}> {
         return <ReactTable
             data={(this.state as WindowInfoState).data}
             columns={this.columns}
-            minRows={5}
+            minRows={15}
             showPagination={false}
             style={{
                 height: "calc(100vh - 79px)"

@@ -42,7 +42,7 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
     }
 
     columns = [
-        { Header: 'ID', accessor: 'process.processId', width: 70, className: 'cell-center'},
+        { Header: 'ID', accessor: 'process.processId', width: 50, className: 'cell-center'},
         { 
             Header: 'Application', id: 'name', headerStyle: { textAlign: "left" }, minWidth: 150, accessor: (inf) => {
                 if (inf.parentUUID!= '' && inf.parentUUID != inf.process.uuid) {
@@ -55,12 +55,12 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
         },
         { Header: 'URL', headerStyle: { textAlign: "left" }, accessor: 'info.manifest.startup_app.url', minWidth: 200, Cell: c => <div className="cell-overflow"title={c.value}>{c.value}</div>},
         { Header: 'Manifest', headerStyle: { textAlign: "left" }, accessor: 'info.manifestUrl', minWidth: 200, Cell: c => <div className="cell-overflow"title={c.value}>{c.value}</div>},
-        { Header: 'Runtime', accessor: 'info.runtime.version', width: 100, className: 'cell-center'},
-        { Header: 'CPU', accessor: 'process.cpuUsage', width: 80, className: 'cell-center'},
-        { Header: 'Mem', id: 'mem', width: 80, className: 'cell-center', accessor: (inf) => {
+        { Header: 'Runtime', accessor: 'info.runtime.version', width: 80, className: 'cell-center'},
+        { Header: 'CPU', accessor: 'process.cpuUsage', width: 50, className: 'cell-center'},
+        { Header: 'Mem', id: 'mem', width: 50, className: 'cell-center', accessor: (inf) => {
             return formatBytes(inf.process.workingSetSize||0.00, 1);
         }},
-        { Header: 'Actions', width: 120, className: 'cell-center', Cell: cellInfo => (
+        { Header: 'Actions', width: 100, className: 'cell-center', Cell: cellInfo => (
             <ButtonGroup>
                 <Button title="Launch Debugger" type="primary" icon="code" onClick={(e) => this.launchDebugger(cellInfo.original.process)}></Button>
                 <Button title="Show App Info" type="primary" icon="info-circle" onClick={(e) => this.showAppInfo(cellInfo.original.process)}></Button>
@@ -81,7 +81,7 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
         return <ReactTable
             data={(this.state as ProcessInfoState).data}
             columns={this.columns}
-            minRows={5}
+            minRows={15}
             showPagination={false}
             style={{
                 height: "calc(100vh - 79px)"
