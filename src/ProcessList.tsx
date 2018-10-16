@@ -81,7 +81,7 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
         return <ReactTable
             data={(this.state as ProcessInfoState).data}
             columns={this.columns}
-            minRows={15}
+            minRows={5}
             showPagination={false}
             style={{
                 height: "calc(100vh - 79px)"

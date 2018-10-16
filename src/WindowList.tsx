@@ -97,7 +97,7 @@ export class WindowList extends React.Component<WindowListProps, {}> {
         return <ReactTable
             data={(this.state as WindowInfoState).data}
             columns={this.columns}
-            minRows={15}
+            minRows={5}
             showPagination={false}
             style={{
                 height: "calc(100vh - 79px)"
