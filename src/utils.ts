@@ -9,6 +9,9 @@ export const formatBytes = (size:number, places: number) => {
         return (size / MB).toFixed(places) + 'MB'
     } else if (size > KB) {
         return (size / KB).toFixed(places) + 'KB'
+    } else if (size === 0) {
+        return '0';
+    } else {
+        return size.toFixed(1) + 'B'
     }
-    return size.toLocaleString();
 }
