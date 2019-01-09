@@ -105,11 +105,14 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
         fin.desktop.System.showDeveloperTools(proc.uuid || '', proc.name || '', console.log, console.error);
     }
 
-    showAppInfo(proc:fin.ProcessInfo) {
+    async showAppInfo(proc:fin.ProcessInfo) {
         const appInfoDiv = document.getElementById('appDetails');
         if (appInfoDiv) {
-            appInfoDiv.innerHTML = JSON.stringify(this.processCache[proc.uuid||''].manifest, null, 4);
             appInfoDiv.classList.add('showing');
+            const appInfoContent = document.getElementById('appDetailsContent');
+            if (appInfoContent) {
+                appInfoContent.innerHTML = JSON.stringify(this.processCache[proc.uuid||''].manifest, null, 4);
+            }
         }
     }
 

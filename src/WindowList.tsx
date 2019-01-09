@@ -123,8 +123,11 @@ export class WindowList extends React.Component<WindowListProps, {}> {
         console.log('showing window info: ' + JSON.stringify(win));
         const winInfoDiv = document.getElementById('winDetails');
         if (winInfoDiv) {
-            winInfoDiv.innerHTML = JSON.stringify(win, null, 4);
             winInfoDiv.classList.add('showing');
+            const winInfoDivContent = document.getElementById('winDetailsContent');
+            if (winInfoDivContent) {
+                winInfoDivContent.innerHTML = JSON.stringify(win, null, 4);
+            }
         }
     }
 

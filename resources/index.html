@@ -12,7 +12,13 @@
     <div id="header"></div>
     <div id="content"></div>
     <div id="footer"></div>
-    <div id="appDetails"></div>
-    <div id="winDetails"></div>
+    <div id="appDetails">
+        <div id="appDetailsClose" onclick="this.parentElement.classList.remove('showing');">X</div>
+        <div id="appDetailsContent"></div>
+    </div>
+    <div id="winDetails">
+        <div id="winDetailsClose" onclick="this.parentElement.classList.remove('showing');">X</div>
+        <div id="winDetailsContent"></div>
+    </div>
 </body>
 </html>
