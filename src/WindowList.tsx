@@ -5,7 +5,8 @@ import { Button } from 'antd';
 import 'react-table/react-table.css';
 
 import './interfaces';
-import { _Window } from 'openfin/_v2/api/window/window';
+import { WindowDetail } from 'openfin/_v2/api/system/window';
+import { EntityInfo } from 'openfin/_v2/api/system/entity';
 
 interface WindowListProps {
     polling?: boolean;
@@ -14,7 +15,7 @@ interface WindowInfoState {
     data: windowDetails[];
 }
 
-interface windowDetails extends fin.WindowDetails {
+interface windowDetails extends WindowDetail {
     uuid: string;
     name: string;
     url: string;
@@ -108,12 +109,12 @@ export class WindowList extends React.Component<WindowListProps, {}> {
 
     launchDebugger(win:windowDetails):void {
         console.log('showing dev tools for window: ' + JSON.stringify(win));
-        fin.desktop.System.showDeveloperTools(win.uuid||'', win.name||'', console.log, console.error);
+        fin.System.showDeveloperTools({ uuid: win.uuid||''});
     }
 
-    centerWindow(win:windowDetails) {
+    async centerWindow(win:windowDetails) {
         console.log('centering window: ' + JSON.stringify(win));
-        const ofwin = fin.desktop.Window.wrap(win.uuid||'', win.name||'');
+        const ofwin = await fin.Window.wrap({ uuid: win.uuid||''});
         ofwin.moveTo(100, 100);
         ofwin.focus();
         ofwin.bringToFront();
@@ -131,12 +132,13 @@ export class WindowList extends React.Component<WindowListProps, {}> {
         }
     }
 
-    closeWindow(win:windowDetails) {
+    async closeWindow(win:windowDetails) {
         console.log('closing window: ' + JSON.stringify(win));
-        fin.desktop.Window.wrap(win.uuid||'', win.name||'').close();
+        const w = await fin.Window.wrap({ uuid: win.uuid||''});
+        w.close();
     }
 
-    getWindowPositionInfo(win:fin.WindowInfo) {
+    getWindowPositionInfo(win:WindowDetail) {
         const info = {
             size: '',
             position: `(${win.top},${win.left})`,
@@ -148,37 +150,33 @@ export class WindowList extends React.Component<WindowListProps, {}> {
         return info;
     }
 
-    private pollForWindows() {
+    private async pollForWindows() {
         if (this.props.polling) {
             const winList:windowDetails[] = [];
-            fin.desktop.System.getAllWindows(async (list) => {
-
-                const allWins = list.map(w => [w.mainWindow!].concat(w.childWindows!).map(cw => 
-                    Object.assign(cw, {
-                        uuid: w.uuid!, 
-                        name: cw.name || '',
-                        url: '', 
-                        parentName: '', 
-                        parentUUID: '', 
-                        childCount: w.childWindows!.length,
-                        windowInfo: this.getWindowPositionInfo(cw),
-                        showing: true
-                    }))
-                ).reduce( (p,c) => p.concat(c), []);
-
-                for (let w of allWins) {
-                    const fInfo:fin.EntityInfo = await new Promise<fin.EntityInfo>(r => fin.desktop.Frame.wrap(w.uuid!, w.name!).getInfo(r));
-                    w.parentName = fInfo.parent.name;
-                    w.parentUUID = fInfo.parent.uuid;
-                    const ofWin = await fin.Window.wrap(w);
-                    const info = await ofWin.getInfo();
-                    w.url = info.url;
-                    w.showing = await ofWin.isShowing();
-                    winList.push(w);
-                }
-
-                this.setState({data: winList});
-            });
+            const list = await fin.System.getAllWindows();
+            const allWins = list.map(w => [w.mainWindow!].concat(w.childWindows!).map(cw => 
+                Object.assign(cw, {
+                    uuid: w.uuid!, 
+                    name: cw.name || '',
+                    url: '', 
+                    parentName: '', 
+                    parentUUID: '', 
+                    childCount: w.childWindows!.length,
+                    windowInfo: this.getWindowPositionInfo(cw),
+                    showing: true
+                }))
+            ).reduce( (p,c) => p.concat(c), []);
+            for (let w of allWins) {
+                const fInfo:EntityInfo = await new Promise<EntityInfo>(r => fin.desktop.Frame.wrap(w.uuid!, w.name!).getInfo(r));
+                w.parentName = fInfo.parent.name||'';
+                w.parentUUID = fInfo.parent.uuid;
+                const ofWin = await fin.Window.wrap(w);
+                const info = await ofWin.getInfo();
+                w.url = info.url;
+                w.showing = await ofWin.isShowing();
+                winList.push(w);
+            }
+            this.setState({ data: winList });
         }
     }
 }

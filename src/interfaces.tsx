@@ -22,8 +22,3 @@ interface Manifest {
 interface StartUpApp {
     url: string;
 }
-
-interface ServiceEvent {
-    source: string;
-    message: string;
-}

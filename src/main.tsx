@@ -48,10 +48,7 @@ export class App extends React.Component<AppProps, {}> {
     constructor(props) {
         super(props);
         this.state = {currentKey: "1", pollProcesses: true, contentHeight: 600, contentWidth: 800, rvmInfo: 'RVM v0.0.0', openAppModalVisible: false};
-        fin.desktop.System.getRvmInfo( (info) => {
-            this.setState({ rvmInfo: 'RVM: ' + info.version});
-            this.setState({ extras: this.getExtras((this.state as AppState).currentKey)});
-        });
+        this.updateRVMInfo();
     }
 
     componentDidMount() {
@@ -84,7 +81,7 @@ export class App extends React.Component<AppProps, {}> {
                 <TabPane tab="Applications" key="1"><ProcessList polling={(this.state as AppState).pollProcesses}></ProcessList></TabPane>
                 <TabPane tab="Logs" key="2"><LogList polling={(this.state as AppState).pollLogs}></LogList></TabPane>
                 <TabPane tab="Windows" key="3"><WindowList polling={(this.state as AppState).pollWindows}></WindowList></TabPane>
-                <TabPane tab="Workspace" key="4"><Workspace height={(this.state as AppState).contentHeight} width={(this.state as AppState).contentWidth} polling={(this.state as AppState).pollWindows}></Workspace></TabPane>
+                <TabPane tab="Workspace" key="4"><Workspace polling={(this.state as AppState).pollWindows} height={(this.state as AppState).contentHeight} width={(this.state as AppState).contentWidth}></Workspace></TabPane>
                 <TabPane tab="Services" key="5"><ServiceList polling={(this.state as AppState).pollServices}></ServiceList></TabPane>
             </Tabs>
             <Modal title="Open Application" visible={(this.state as AppState).openAppModalVisible} onOk={() => this.openApplication()} onCancel={() => this.hideOpenAppModal()} okText="Open" cancelText="Cancel" >
@@ -92,42 +89,63 @@ export class App extends React.Component<AppProps, {}> {
                     Enter an application manifest below, if you do not have a manifest/config, 
                     simply enter the application's main URL.
                 </p>
-                <p>
-                    Manifest URL:<br/>
-                    <input className="modalInput" id="appManifestUrl" type="text" placeholder="https://my.application.com/app.json" />
-                </p>
-                <p>
-                    Site URL:<br/>
-                    <input className="modalInput" id="appSiteUrl" type="text" placeholder="https://my.application.com/" />
-                </p>
+                <div id="appLaunchForm">
+                    <p>
+                        Manifest URL:<br/>
+                        <input className="modalInput" id="appManifestUrl" type="text" placeholder="https://my.application.com/app.json" />
+                    </p>
+                    <p>
+                        Site URL:<br/>
+                        <input className="modalInput" id="appSiteUrl" type="text" placeholder="https://my.application.com/" />
+                    </p>
+                </div>
             </Modal>
         </div>;
     }
 
+    async updateRVMInfo() {
+        const info = await fin.System.getRvmInfo();
+        this.setState({ rvmInfo: 'RVM: ' + info.version});
+        this.setState({ extras: this.getExtras((this.state as AppState).currentKey)});
+    }
+
     showOpenAppModal() {
         this.setState({ openAppModalVisible: true });
+        const launchForm = document.getElementById('appLaunchForm');
+        if (launchForm) {
+            launchForm.classList.remove('error');
+        }
     }
     
-    openApplication() {
+    async openApplication() {
         const manifestURLElem = document.getElementById('appManifestUrl');
         const siteURLElem = document.getElementById('appSiteUrl');
         if (manifestURLElem && (manifestURLElem as HTMLInputElement).value !== '') {
             const manifestURL = (manifestURLElem as HTMLInputElement).value;
             console.log('launching app from manifest url: ' + manifestURL);
-            fin.desktop.Application.createFromManifest(manifestURL, (app) => {
-                app.run(console.log, console.log);
-            }, (e) => console.log('error creating app from manifest: ' + e));
+            try {
+                const app = await fin.Application.createFromManifest(manifestURL);
+                app.run();
+            } catch(e) {
+                console.error('error creating app from manifest', e);
+            }
             this.hideOpenAppModal();
         } else if (siteURLElem && (siteURLElem as HTMLInputElement).value !== '') {
             const siteURL = (siteURLElem as HTMLInputElement).value;
             const opts = Object.assign({}, this.defaultAppOptions, {name: this.url2Name(siteURL), uuid: this.url2UUID(siteURL), url: siteURL});
             console.log('launching app from url (generated json): ' + siteURL + ', name: ' + opts.name + ', uuid: ' + opts.uuid);
-            const newApp = new fin.desktop.Application(opts, () => console.log('app created from URL'), (e) => console.log('error creating app from URL: ' + e));
-            newApp.run();
+            try {
+                const newApp = await fin.Application.create(opts);
+                newApp.run();
+            } catch(e) {
+                console.error('error creating app from URL', e);
+            }
             this.hideOpenAppModal();
         } else {
-            // TODO better error UI
-            console.log('must enter a url');
+            const launchForm = document.getElementById('appLaunchForm');
+            if (launchForm) {
+                launchForm.classList.add('error');
+            }
         }
     }
 

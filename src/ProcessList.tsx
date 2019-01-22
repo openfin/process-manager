@@ -6,6 +6,7 @@ import 'react-table/react-table.css';
 
 import './interfaces';
 import {formatBytes} from './utils'
+import { ProcessInfo } from 'openfin/_v2/api/system/process';
 
 
 interface ProcessListProps {
@@ -23,15 +24,15 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
     timer = 0;
     processCache: {[key:string]:AppInfo} = {};
 
-    static closeAllApps() {
-        fin.desktop.System.getProcessList(async (list) => {
-            for (let i = 0; i < list.length; i++) {
-                const uuid = list[i].uuid||'';
-                if (uuid !== '' && uuid !== 'process-manager') {
-                    fin.desktop.Application.wrap(uuid).close(true);
-                }
+    static async closeAllApps() {
+        const procs = await fin.System.getProcessList();
+        for (let i = 0; i < procs.length; i++) {
+            const uuid = procs[i].uuid||'';
+            if (uuid !== '' && uuid !== 'process-manager') {
+                const app = await fin.Application.wrap({ uuid: uuid});
+                app.close(true);
             }
-        });
+        }
     }
 
     constructor(props) {
@@ -101,11 +102,11 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
         window.clearInterval(this.timer);
     }
 
-    launchDebugger(proc):void {
-        fin.desktop.System.showDeveloperTools(proc.uuid || '', proc.name || '', console.log, console.error);
+    launchDebugger(proc:ProcessInfo):void {
+        fin.System.showDeveloperTools({ uuid: proc.uuid||''});
     }
 
-    async showAppInfo(proc:fin.ProcessInfo) {
+    async showAppInfo(proc:ProcessInfo) {
         const appInfoDiv = document.getElementById('appDetails');
         if (appInfoDiv) {
             appInfoDiv.classList.add('showing');
@@ -116,34 +117,30 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
         }
     }
 
-    closeApp(proc:fin.ProcessInfo) {
+    async closeApp(proc:ProcessInfo) {
         console.log('closing app ' + proc.uuid);
-        fin.desktop.Application.wrap(proc.uuid||'').close();
+        const app = await fin.Application.wrap({ uuid: proc.uuid||''});
+        app.close();
     }
 
-    private pollForApps() {
+    private async pollForApps() {
         if (this.props.polling) {
+            const procs = await fin.System.getProcessList();
             const procList:AppProcessInfo[] = [];
-            fin.desktop.System.getProcessList(async (list) => {
-                for (let i = 0; i < list.length; i++) {
-                    const proc = list[i];
-                    const app = fin.desktop.Application.wrap(proc.uuid||'');
-                    const appInf = await new Promise((res, rej) => {
-                        app.getInfo(res, rej);
-                    });
-                    let appParent = '';
-                    try {
-                        appParent = await new Promise<string>((res, rej) => {
-                            app.getParentUuid(res, rej);
-                        });
-                    } catch(e) {
-                        //console.log('no parent app for: '+ proc.uuid);
-                    }
-                    this.processCache[proc.uuid || ''] = appInf as AppInfo;
-                    procList[procList.length] = { process: proc, info: appInf as AppInfo, parentUUID: appParent};
+            for (let i = 0; i < procs.length; i++) {
+                const proc = procs[i];
+                const app = await fin.Application.wrap({ uuid: proc.uuid||''});
+                const appInf = await app.getInfo();
+                let appParent = '';
+                try {
+                    appParent = await app.getParentUuid();
+                } catch(e) {
+                    //console.log('no parent app for: '+ proc.uuid);
                 }
-                this.setState({data: procList});
-            });
+                this.processCache[proc.uuid || ''] = appInf as AppInfo;
+                procList[procList.length] = { process: proc, info: appInf as AppInfo, parentUUID: appParent};
+            }
+            this.setState({data: procList});
         }
     }
 }

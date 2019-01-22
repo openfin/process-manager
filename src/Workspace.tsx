@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { MonitorInfo } from 'openfin/_v2/api/system/monitor';
+import { WindowDetail } from 'openfin/_v2/api/system/window';
+import { EntityInfo } from 'openfin/_v2/api/system/entity';
 
 interface WorkspaceProps {
     polling?: boolean;
@@ -26,7 +28,7 @@ interface monitorInfo {
     name: string;
 }
 
-interface windowInfo extends fin.WindowInfo {
+interface windowInfo extends WindowDetail {
     color: string;
     area: number;
     showing: boolean;
@@ -215,32 +217,29 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
             this.setSize();
             
             // window stuff
-            const winList:fin.WindowInfo[] = [];
-             fin.desktop.System.getAllWindows(async (list) => {
-                const allWins = list.map(w => [w.mainWindow!].concat(w.childWindows!).map(cw => 
-                    Object.assign(cw, {
-                        uuid: w.uuid!,
-                        parentName: '',
-                        parentUUID: '',
-                        color: this.getRandomFillColor(w.uuid!, cw.name!),
-                        area: 0,
-                        showing: false
-                    }))
-                ).reduce( (p,c) => p.concat(c), []);
-                for (let w of allWins) {
-                    const fInfo:fin.EntityInfo = await new Promise<fin.EntityInfo>(r => fin.desktop.Frame.wrap(w.uuid!, w.name!).getInfo(r));
-                    w.parentName = fInfo.parent.name;
-                    w.parentUUID = fInfo.parent.uuid;
-                    const ofWin = await fin.Window.wrap(w);
-                    const info = await ofWin.getInfo();
-                    w.showing = await ofWin.isShowing();
-                    w.area = this.calcWindowArea(w);
-                    winList.push(w);
-                }
-                this.setState({
-                    data: winList
-                });
-            });
+            const winList:WindowDetail[] = [];
+            const list = await fin.System.getAllWindows();
+            const allWins = list.map(w => [w.mainWindow!].concat(w.childWindows!).map(cw => 
+                Object.assign(cw, {
+                    uuid: w.uuid!,
+                    parentName: '',
+                    parentUUID: '',
+                    color: this.getRandomFillColor(w.uuid!, cw.name!),
+                    area: 0,
+                    showing: false
+                }))
+            ).reduce( (p,c) => p.concat(c), []);
+            for (let w of allWins) {
+                const fInfo:EntityInfo = await new Promise<EntityInfo>(r => fin.desktop.Frame.wrap(w.uuid!, w.name!).getInfo(r));
+                w.parentName = fInfo.parent.name||'';
+                w.parentUUID = fInfo.parent.uuid;
+                const ofWin = await fin.Window.wrap(w);
+                const info = await ofWin.getInfo();
+                w.showing = await ofWin.isShowing();
+                w.area = this.calcWindowArea(w);
+                winList.push(w);
+            }
+            this.setState({ data: winList });
             this.updateCanvas();
         }
     }

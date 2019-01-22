@@ -3,6 +3,8 @@ import ReactTable from 'react-table';
 import { Button } from 'antd';
 
 import {formatBytes} from './utils';
+import { WindowOption } from 'openfin/_v2/api/window/windowOption';
+import { LogInfo } from 'openfin/_v2/api/system/log';
 
 interface LogListProps {
     polling?: boolean;
@@ -66,11 +68,15 @@ export class LogList extends React.Component<LogListProps, {}> {
         />;
     }
 
-    showLog(log:LogFile) {
-        const opts: fin.WindowOptions = {name: log.fileName, autoShow: true, url: 'log.html', defaultWidth: 600, defaultHeight: 400};
-        const logWin: fin.OpenFinWindow = new fin.desktop.Window(opts, () => {
-            logWin.getNativeWindow().postMessage(log.fileName, '*');
-        }, (e) => console.error('error loading log file' + e));
+    async showLog(log:LogFile) {
+        const opts: WindowOption = {name: log.fileName, autoShow: true, url: 'log.html', defaultWidth: 600, defaultHeight: 400};
+        try {
+            await fin.Window.create(opts);
+            var bc = new BroadcastChannel('of-proc-mgr-log-view');
+            bc.postMessage(log.fileName);
+        } catch(e) {
+            console.error('error loading log file: ' + log.fileName, e);
+        }
     }
 
     emailLog(log:LogFile) {
@@ -79,22 +85,20 @@ export class LogList extends React.Component<LogListProps, {}> {
         console.log(`emailing log ${log.fileName}`)
     }
 
-    private pollForLogs() {
+    private async pollForLogs() {
         if (this.props.polling) {
             const logList:LogFile[] = [];
-
-            fin.desktop.System.getLogList((list) => {
-                const newList = this.processLogList(list);
-                for (let i = 0; i < newList.length; i++) {
-                    const log = newList[i];
-                    logList[logList.length] = log;
-                }
-                this.setState({logs: logList});
-            });
+            const list = await fin.System.getLogList();
+            const newList = this.processLogList(list);
+            for (let i = 0; i < newList.length; i++) {
+                const log = newList[i];
+                logList[logList.length] = log;
+            }
+            this.setState({logs: logList});
         }
     }
     
-    private processLogList(list: fin.LogInfo[]): LogFile[] {
+    private processLogList(list: LogInfo[]): LogFile[] {
         const results = new Array<LogFile>();
         for (let i = 0; i < list.length; i++) {
             const log = list[i];
@@ -109,7 +113,7 @@ export class LogList extends React.Component<LogListProps, {}> {
         return results;
     }
 
-    private makeProcessedLogInfo(log: fin.LogInfo): LogFile {
+    private makeProcessedLogInfo(log: LogInfo): LogFile {
         const dateOpts = {year: 'numeric', month: '2-digit', day: '2-digit'};
         const timeOpts = {hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'};
         const logDate = new Date(Date.parse(log.date || ''));

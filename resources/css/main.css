@@ -115,3 +115,7 @@ body {
     right: 10px;
     cursor: pointer;
 }
+
+#appLaunchForm.error p {
+    color: red;
+}
