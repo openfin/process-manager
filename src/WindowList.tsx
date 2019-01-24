@@ -109,12 +109,12 @@ export class WindowList extends React.Component<WindowListProps, {}> {
 
     launchDebugger(win:windowDetails):void {
         console.log('showing dev tools for window: ' + JSON.stringify(win));
-        fin.System.showDeveloperTools({ uuid: win.uuid||''});
+        fin.System.showDeveloperTools({ uuid: win.uuid||'', name: win.name||''});
     }
 
     async centerWindow(win:windowDetails) {
         console.log('centering window: ' + JSON.stringify(win));
-        const ofwin = await fin.Window.wrap({ uuid: win.uuid||''});
+        const ofwin = await fin.Window.wrap({ uuid: win.uuid||'', name: win.name||''});
         ofwin.moveTo(100, 100);
         ofwin.focus();
         ofwin.bringToFront();
@@ -134,7 +134,7 @@ export class WindowList extends React.Component<WindowListProps, {}> {
 
     async closeWindow(win:windowDetails) {
         console.log('closing window: ' + JSON.stringify(win));
-        const w = await fin.Window.wrap({ uuid: win.uuid||''});
+        const w = await fin.Window.wrap({ uuid: win.uuid||'', name: win.name||''});
         w.close();
     }
 
