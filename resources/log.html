@@ -10,7 +10,7 @@
                 bc.onmessage = async (e) => {
                     console.log(e);
                     const filename = e.data;
-                    if (filename) {
+                    if (filename === window.name) {
                         document.title += ' ' + filename;
                         try {
                             const lines = await fin.System.getLog({name: filename});

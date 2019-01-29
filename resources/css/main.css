@@ -111,9 +111,11 @@ body {
 }
 
 #appDetailsClose, #winDetailsClose {
-    position: absolute;
-    right: 10px;
+    position: fixed;
+    right: 28%;
+    top: 23%;
     cursor: pointer;
+    font-weight: bold;
 }
 
 #appLaunchForm.error p {
