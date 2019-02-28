@@ -2,6 +2,7 @@ import * as React from 'react';
 import { MonitorInfo } from 'openfin/_v2/api/system/monitor';
 import { WindowDetail } from 'openfin/_v2/api/system/window';
 import { EntityInfo } from 'openfin/_v2/api/system/entity';
+import { checkPropTypes } from 'prop-types';
 
 interface WorkspaceProps {
     polling?: boolean;
@@ -38,6 +39,7 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
 
     timer = 0;
     brightness = 150;
+    labelHeight = 28;
     colorCache:{[key:string]:string};
 
     constructor(props:WorkspaceProps) {
@@ -70,7 +72,10 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
     }
 
     render() {
-        return <canvas id="workspace" ref="canvas" width={(this.state as WorkspaceState).width} height={(this.state as WorkspaceState).height} />;
+        return <div>
+            <canvas id="workspace-labels" ref="labelcanvas" width={(this.state as WorkspaceState).width} height={this.labelHeight} />
+            <canvas id="workspace" ref="canvas" width={(this.state as WorkspaceState).width} height={(this.state as WorkspaceState).height} />
+        </div>;
     }
 
     startPolling() {
@@ -84,7 +89,7 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
 
     setSize() {
         let w = document.body.clientWidth-20;
-        let h = document.body.clientHeight-80;
+        let h = document.body.clientHeight-(80 + this.labelHeight);
         const vaspect = (this.state as WorkspaceState).virtualWidth / (this.state as WorkspaceState).virtualHeight;
         const caspect = w / h;
         if ( vaspect > caspect ) {
@@ -98,6 +103,8 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
     updateCanvas() {
         const canv = this.refs.canvas as HTMLCanvasElement;
         const ctx = canv.getContext('2d');
+        const canv2 = this.refs.labelcanvas as HTMLCanvasElement;
+        const ctx2 = canv2.getContext('2d');
         const state = (this.state as WorkspaceState);
         const xScaleFactor = state.width / state.virtualWidth;
         const yScaleFactor = state.height / state.virtualHeight;
@@ -109,8 +116,9 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
         if (state.virtualTop < 0) {
             yoffset = Math.abs(state.virtualTop * yScaleFactor);
         }
-        if (ctx) {
+        if (ctx && ctx2) {
             ctx.clearRect(0, 0, state.width, state.height);
+            ctx2.clearRect(0, 0, state.width, this.labelHeight);
             const winData = state.data;
             winData.sort((a,b) => {
                 return (a.area === b.area) ? 0 : (b.area - a.area);
@@ -123,7 +131,8 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
             }
             for (let j=0; j<(this.state as WorkspaceState).monitors.length; j++) {
                 const monInfo = (this.state as WorkspaceState).monitors[j];
-                this.makeMonitorRect(ctx, monInfo, j, xScaleFactor, xoffset, yScaleFactor, yoffset);
+                this.makeMonitorRect(ctx, monInfo, xScaleFactor, xoffset, yScaleFactor, yoffset);
+                this.makeMonitorLabel(ctx2, monInfo, xScaleFactor, xoffset);
             }
         }
     }
@@ -149,7 +158,7 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
         ctx.fillText(props.name!, scaledL+xoffset+5, scaledT+yoffset+15, scaledW);
     }
 
-    makeMonitorRect(ctx:CanvasRenderingContext2D, props:monitorInfo, monNumber: number, xscale: number, xoffset:number, yscale: number, yoffset: number) {
+    makeMonitorRect(ctx:CanvasRenderingContext2D, props:monitorInfo, xscale: number, xoffset:number, yscale: number, yoffset: number) {
         const h = props.bottom - props.top;
         const w = props.right - props.left;
         const scaledH = h * yscale;
@@ -162,10 +171,18 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
         ctx.setLineDash([5,2,3]);
         ctx.strokeRect(scaledL+xoffset, scaledT+yoffset, scaledW, scaledH);
         ctx.setLineDash([0]);
+    }
+
+    makeMonitorLabel(ctx:CanvasRenderingContext2D, props:monitorInfo, xscale: number, xoffset:number) {
+        const h = props.bottom - props.top;
+        const w = props.right - props.left;
+        const scaledW = w * xscale;
+        const scaledL = props.left * xscale;
 
         ctx.fillStyle = "#000000";
         ctx.font = '12px Arial';
-        ctx.fillText(props.name, scaledL+xoffset+5, scaledT+yoffset+15, scaledW);
+        const label = `${props.right-props.left}W x ${props.bottom-props.top}H (${props.left},${props.top} to ${props.right},${props.bottom})`;
+        ctx.fillText(label, scaledL+xoffset+5, (this.labelHeight/2)+6, scaledW);
     }
 
     getRandomFillColor(uuid: string, name: string) {

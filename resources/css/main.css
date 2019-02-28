@@ -74,10 +74,13 @@ body {
     font-size: 13px;
 }
 
-#workspace {
+#workspace, #workspace-labels {
     display: block;
     margin: auto;
     border:1px solid #000;
+}
+#workspace-labels {
+    border-bottom: 0px;
 }
 
 #logger {
