@@ -5,13 +5,13 @@
     "logging": true,
     "startup_app": {
         "name": "process-manager",
-        "version": "1.4.1",
+        "version": "1.7.3",
         "description": "Process Manager",
-        "url": "https://cdn.openfin.co/demos/process-manager2/index.html",
+        "url": "ROOT_URL/index.html",
         "uuid": "process-manager",
         "defaultHeight": 800,
         "defaultWidth": 600,
-        "applicationIcon": "https://cdn.openfin.co/demos/process-manager2/img/proc-mgr-icon.png",
+        "applicationIcon": "ROOT_URL/img/proc-mgr-icon.png",
         "company": "OpenFin",
         "autoShow": true
     },
@@ -19,11 +19,11 @@
         "arguments": "",
         "version": "stable"
     },
-    "splashScreenImage": "https://cdn.openfin.co/demos/process-manager2/img/proc-mgr-splash.png",
+    "splashScreenImage": "ROOT_URL/img/proc-mgr-splash.png",
     "shortcut": {
         "company": "OpenFin",
         "description": "OpenFin Process Manager",
-        "icon": "https://cdn.openfin.co/demos/process-manager2/img/proc-mgr-icon.ico",
+        "icon": "ROOT_URL/img/proc-mgr-icon.ico",
         "name": "Process Manager"
     }
 }
