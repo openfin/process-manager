@@ -1,5 +1,6 @@
 {
     "default_icon": "default_icon.png",
+    "licenseKey": "64605fac-add3-48a0-8710-64b38e96a2dd",
     "devtools_port": 9090,
     "websocket_port": 9696,
     "logging": true,

@@ -14,7 +14,7 @@ pipeline {
                 script {
                     GIT_SHORT_SHA = sh ( script: "git rev-parse --short HEAD", returnStdout: true ).trim()
                     VERSION = sh ( script: "node -pe \"require('./package.json').version\"", returnStdout: true ).trim()
-                    S3_LOC = env.CDN_DEMO_S3_ROOT + 'process-manager2'
+                    S3_LOC = env.PROCESS_MANAGER_S3_ROOT
                 }
                 sh "npm i"
                 sh "npm run build"
