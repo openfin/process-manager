@@ -19,10 +19,10 @@ pipeline {
                 sh "npm i"
                 sh "npm run build"
                 sh "echo \"${VERSION} ${GIT_SHORT_SHA}\" > ./build/version.txt"
-                sh "aws s3 cp ./build ${S3_LOC}/ --recursive --exclude '*.svg' --exclude 'app.*.json' --exclude 'index.html'"
+                sh "aws s3 cp ./build ${S3_LOC}/ --recursive --exclude '*.svg' --exclude 'app*.json' --exclude 'index.html'"
                 sh "aws s3 cp ./build ${S3_LOC}/ --recursive --exclude '*' --include 'index.html' --content-type 'text/html; charset=utf-8'"
                 sh "aws s3 cp ./build ${S3_LOC}/ --recursive --exclude '*' --include '*.svg' --content-type 'image/svg+xml'"
-                sh "aws s3 cp ./build ${S3_LOC}/ --recursive --exclude '*' --include 'app.*.json' --exclude 'app.local.*.json' --content-type 'application/json'"
+                sh "aws s3 cp ./build ${S3_LOC}/ --recursive --exclude '*' --include 'app*.json' --exclude 'app.local.*.json' --content-type 'application/json'"
             }
         }
     }
