@@ -5,7 +5,7 @@ import { Button } from 'antd';
 import 'react-table/react-table.css';
 
 import './interfaces';
-import {formatBytes} from './utils'
+import {formatBytes} from './utils';
 import { ProcessInfo } from 'openfin/_v2/api/system/process';
 
 
@@ -29,7 +29,7 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
         for (let i = 0; i < procs.length; i++) {
             const uuid = procs[i].uuid||'';
             if (uuid !== '' && uuid !== 'process-manager') {
-                const app = await fin.Application.wrap({ uuid: uuid});
+                const app = await fin.Application.wrap({ uuid});
                 app.close(true);
             }
         }
@@ -46,7 +46,7 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
         { Header: 'ID', accessor: 'process.processId', width: 50, className: 'cell-center'},
         { 
             Header: 'Application', id: 'name', headerStyle: { textAlign: "left" }, minWidth: 150, accessor: (inf) => {
-                if (inf.parentUUID!= '' && inf.parentUUID != inf.process.uuid) {
+                if (inf.parentUUID !== '' && inf.parentUUID !== inf.process.uuid) {
                     return ` - ${inf.process.uuid} (${inf.parentUUID})`;
                 } else {
                     return inf.process.uuid;

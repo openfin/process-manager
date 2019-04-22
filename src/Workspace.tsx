@@ -2,7 +2,6 @@ import * as React from 'react';
 import { MonitorInfo } from 'openfin/_v2/api/system/monitor';
 import { WindowDetail } from 'openfin/_v2/api/system/window';
 import { EntityInfo } from 'openfin/_v2/api/system/entity';
-import { checkPropTypes } from 'prop-types';
 
 interface WorkspaceProps {
     polling?: boolean;
@@ -17,11 +16,11 @@ interface WorkspaceState {
     virtualHeight: number;
     virtualLeft: number;
     virtualWidth: number;
-    data: windowInfo[];
-    monitors: monitorInfo[];
+    data: WindowInfo[];
+    monitors: Monitor[];
 }
 
-interface monitorInfo {
+interface Monitor {
     top: number;
     left: number;
     bottom: number;
@@ -29,7 +28,7 @@ interface monitorInfo {
     name: string;
 }
 
-interface windowInfo extends WindowDetail {
+interface WindowInfo extends WindowDetail {
     color: string;
     area: number;
     showing: boolean;
@@ -61,7 +60,7 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
             this.stopPolling();
             clearTimeout(resizeTimeout);
             resizeTimeout = window.setTimeout(()=> {
-                this.setSize()
+                this.setSize();
                 this.startPolling();
             }, 100);
         });
@@ -79,7 +78,7 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
     }
 
     startPolling() {
-        this.pollForWorkspaces()
+        this.pollForWorkspaces();
         this.timer = window.setInterval( () => this.pollForWorkspaces(), 1000 );
     }
 
@@ -137,7 +136,7 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
         }
     }
     
-    makeWindowRect(ctx:CanvasRenderingContext2D, props:windowInfo, xscale: number, xoffset:number, yscale: number, yoffset: number) {
+    makeWindowRect(ctx:CanvasRenderingContext2D, props:WindowInfo, xscale: number, xoffset:number, yscale: number, yoffset: number) {
         let h, w = 0;
         if (props.right && props.bottom) {
             h = props.bottom - props.top!;
@@ -158,7 +157,7 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
         ctx.fillText(props.name!, scaledL+xoffset+5, scaledT+yoffset+15, scaledW);
     }
 
-    makeMonitorRect(ctx:CanvasRenderingContext2D, props:monitorInfo, xscale: number, xoffset:number, yscale: number, yoffset: number) {
+    makeMonitorRect(ctx:CanvasRenderingContext2D, props:Monitor, xscale: number, xoffset:number, yscale: number, yoffset: number) {
         const h = props.bottom - props.top;
         const w = props.right - props.left;
         const scaledH = h * yscale;
@@ -173,7 +172,7 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
         ctx.setLineDash([0]);
     }
 
-    makeMonitorLabel(ctx:CanvasRenderingContext2D, props:monitorInfo, xscale: number, xoffset:number) {
+    makeMonitorLabel(ctx:CanvasRenderingContext2D, props:Monitor, xscale: number, xoffset:number) {
         const h = props.bottom - props.top;
         const w = props.right - props.left;
         const scaledW = w * xscale;
@@ -198,18 +197,18 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
     }
 
     randomColorChannel() {
-        var r = 255-this.brightness;
-        var n = 0|((Math.random() * r) + this.brightness);
-        var s = n.toString(16);
-        return (s.length==1) ? '0'+s : s;
+        const r = 255-this.brightness;
+        const n = 0|((Math.random() * r) + this.brightness);
+        const s = n.toString(16);
+        return (s.length === 1) ? '0'+s : s;
     }
 
-    calcWindowArea(win:windowInfo) {
+    calcWindowArea(win:WindowInfo) {
         return (win.right! - win.left!)*(win.bottom! - win.top!);
     }
 
-    getAllMonitors(mons: MonitorInfo): monitorInfo[] {
-        const infos:monitorInfo[] = [];
+    getAllMonitors(mons: MonitorInfo): Monitor[] {
+        const infos:Monitor[] = [];
         const pInfo = mons.primaryMonitor.monitorRect;
         infos[0] = { "top": pInfo.top, left: pInfo.left, bottom: pInfo.bottom, right: pInfo.right, name: 'Main Monitor'};
         for (let i=0; i<mons.nonPrimaryMonitors.length; i++) {
@@ -246,7 +245,7 @@ export class Workspace extends React.Component<WorkspaceProps, {}> {
                     showing: false
                 }))
             ).reduce( (p,c) => p.concat(c), []);
-            for (let w of allWins) {
+            for (const w of allWins) {
                 const fInfo:EntityInfo = await new Promise<EntityInfo>(r => fin.desktop.Frame.wrap(w.uuid!, w.name!).getInfo(r));
                 w.parentName = fInfo.parent.name||'';
                 w.parentUUID = fInfo.parent.uuid;

@@ -12,21 +12,21 @@ interface WindowListProps {
     polling?: boolean;
 }
 interface WindowInfoState {
-    data: windowDetails[];
+    data: WindowDetails[];
 }
 
-interface windowDetails extends WindowDetail {
+interface WindowDetails extends WindowDetail {
     uuid: string;
     name: string;
     url: string;
     parentName: string;
     parentUUID: string;
     childCount: number;
-    windowInfo: windowInfo;
+    windowInfo: WindowInfo;
     showing: boolean;
 }
 
-interface windowInfo {
+interface WindowInfo {
     monitor: string;
     position: string;
     size: string;
@@ -51,7 +51,7 @@ export class WindowList extends React.Component<WindowListProps, {}> {
             Header: 'Window', id: 'name', minWidth: 200, headerStyle: { textAlign: "left" }, accessor: (inf) => {
                 if (inf.parentName) {
                     return ` - ${inf.name} (${inf.parentName})`;
-                } else if (inf.name && inf.name != '') {
+                } else if (inf.name && inf.name !== '') {
                     return inf.name;
                 } else {
                     return inf.uuid;
@@ -107,12 +107,12 @@ export class WindowList extends React.Component<WindowListProps, {}> {
        />;
     }
 
-    launchDebugger(win:windowDetails):void {
+    launchDebugger(win:WindowDetails):void {
         console.log('showing dev tools for window: ' + JSON.stringify(win));
         fin.System.showDeveloperTools({ uuid: win.uuid||'', name: win.name||''});
     }
 
-    async centerWindow(win:windowDetails) {
+    async centerWindow(win:WindowDetails) {
         console.log('centering window: ' + JSON.stringify(win));
         const ofwin = await fin.Window.wrap({ uuid: win.uuid||'', name: win.name||''});
         ofwin.moveTo(100, 100);
@@ -120,7 +120,7 @@ export class WindowList extends React.Component<WindowListProps, {}> {
         ofwin.bringToFront();
     }
 
-    showWindowInfo(win:windowDetails) {
+    showWindowInfo(win:WindowDetails) {
         console.log('showing window info: ' + JSON.stringify(win));
         const winInfoDiv = document.getElementById('winDetails');
         if (winInfoDiv) {
@@ -132,7 +132,7 @@ export class WindowList extends React.Component<WindowListProps, {}> {
         }
     }
 
-    async closeWindow(win:windowDetails) {
+    async closeWindow(win:WindowDetails) {
         console.log('closing window: ' + JSON.stringify(win));
         const w = await fin.Window.wrap({ uuid: win.uuid||'', name: win.name||''});
         w.close();
@@ -152,7 +152,7 @@ export class WindowList extends React.Component<WindowListProps, {}> {
 
     private async pollForWindows() {
         if (this.props.polling) {
-            const winList:windowDetails[] = [];
+            const winList:WindowDetails[] = [];
             const list = await fin.System.getAllWindows();
             const allWins = list.map(w => [w.mainWindow!].concat(w.childWindows!).map(cw => 
                 Object.assign(cw, {
@@ -166,7 +166,7 @@ export class WindowList extends React.Component<WindowListProps, {}> {
                     showing: true
                 }))
             ).reduce( (p,c) => p.concat(c), []);
-            for (let w of allWins) {
+            for (const w of allWins) {
                 const fInfo:EntityInfo = await new Promise<EntityInfo>(r => fin.desktop.Frame.wrap(w.uuid!, w.name!).getInfo(r));
                 w.parentName = fInfo.parent.name||'';
                 w.parentUUID = fInfo.parent.uuid;

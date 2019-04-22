@@ -72,7 +72,7 @@ export class LogList extends React.Component<LogListProps, {}> {
         const opts: WindowOption = {name: log.fileName, autoShow: true, url: 'log.html', defaultWidth: 600, defaultHeight: 400};
         try {
             await fin.Window.create(opts);
-            var bc = new BroadcastChannel('of-proc-mgr-log-view');
+            const bc = new BroadcastChannel('of-proc-mgr-log-view');
             bc.postMessage(log.fileName);
         } catch(e) {
             console.error('error loading log file: ' + log.fileName, e);
@@ -82,7 +82,7 @@ export class LogList extends React.Component<LogListProps, {}> {
     emailLog(log:LogFile) {
         // TODO somehow mail this thing?
         // create hidden href with mailto proto and programitcally click it ?
-        console.log(`emailing log ${log.fileName}`)
+        console.log(`emailing log ${log.fileName}`);
     }
 
     private async pollForLogs() {

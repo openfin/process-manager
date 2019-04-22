@@ -4,7 +4,7 @@ import { Button } from 'antd';
 
 import 'react-table/react-table.css';
 
-import './interfaces'
+import './interfaces';
 import { ProviderIdentity } from 'openfin/_v2/api/interappbus/channel/channel';
 
 interface ServiceListProps {
@@ -31,7 +31,7 @@ export class ServiceList extends React.Component<ServiceListProps, {}> {
 
     columns = [
         { Header: 'Service', headerStyle: { textAlign: "left" }, id: 'name', accessor: (inf) => {
-            if (inf.name && inf.name != '') {
+            if (inf.name && inf.name !== '') {
                 return inf.name;
             } else {
                 return inf.uuid;
@@ -55,7 +55,7 @@ export class ServiceList extends React.Component<ServiceListProps, {}> {
     }
 
     launchDebugger(uuid:string):void {
-        fin.System.showDeveloperTools({ uuid: uuid});
+        fin.System.showDeveloperTools({ uuid});
     }
 
     startPolling() {

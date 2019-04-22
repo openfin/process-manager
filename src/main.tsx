@@ -7,7 +7,7 @@ import { ProcessList } from './ProcessList';
 import { LogList } from './LogList';
 import { ServiceList } from './ServiceList';
 import { WindowList } from './WindowList';
-import { Workspace } from './Workspace'
+import { Workspace } from './Workspace';
 
 import 'antd/dist/antd.less';
 
@@ -162,7 +162,7 @@ export class App extends React.Component<AppProps, {}> {
     }
 
     getExtras(key:string) {
-        const defaultExtras = <span id="rvmInfo">{(this.state as AppState).rvmInfo}</span>
+        const defaultExtras = <span id="rvmInfo">{(this.state as AppState).rvmInfo}</span>;
         if (key === "1") {
             const procMenu = <Menu>
                 <Menu.Item key="0">
