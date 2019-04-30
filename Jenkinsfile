@@ -20,12 +20,12 @@ pipeline {
                 sh "npm run clean"
                 sh "npm run build"
                 sh "echo \"${VERSION} ${GIT_SHORT_SHA}\" > ./build/version.txt"
-                //zip zipFile: 'process-manager.zip', archive: false, dir: 'build'
+                zip zipFile: "process-manager.zip", archive: false, dir: "build", glob: "css/**,img/**,pack/**,*.html,app.json"
                 sh "aws s3 cp ./build ${S3_LOC}/ --recursive --exclude '*.svg' --exclude 'app*.json' --exclude 'index.html'"
                 sh "aws s3 cp ./build ${S3_LOC}/ --recursive --exclude '*' --include 'index.html' --content-type 'text/html; charset=utf-8'"
                 sh "aws s3 cp ./build ${S3_LOC}/ --recursive --exclude '*' --include '*.svg' --content-type 'image/svg+xml'"
                 sh "aws s3 cp ./build ${S3_LOC}/ --recursive --exclude '*' --include 'app*.json' --exclude 'app.local.*.json' --content-type 'application/json'"
-                //sh "aws s3 cp process-manager.zip ${S3_LOC}/ --content-type 'application/zip'"
+                sh "aws s3 cp process-manager.zip ${S3_LOC}/ --content-type 'application/zip'"
             }
         }
     }
