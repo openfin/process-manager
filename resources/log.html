@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>OpenFin Process Manager: </title>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const logger = document.querySelector('#logger');
+            if (logger) {
+                var bc = new BroadcastChannel('of-proc-mgr-log-view');
+                bc.onmessage = async (e) => {
+                    console.log(e);
+                    const filename = e.data;
+                    if (filename === window.name) {
+                        document.title += ' ' + filename;
+                        try {
+                            const lines = await fin.System.getLog({name: filename});
+                            logger.innerHTML = lines;
+                        } catch(e) {
+                            console.log("Error creating log window", e);
+                        }
+                    }
+                };
+            }
+        });
+    </script>
+    <link rel="stylesheet" href="css/main.css"></link>
+</head>
+<body>
+    <div id="logger"></div>
+</body>
+</html>

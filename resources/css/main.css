@@ -1,0 +1,126 @@
+/* some defaults */
+html {
+    height: 100%;
+}
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    position:relative;
+    height: 100%;
+    overflow: hidden;
+}
+
+#content {
+    position:relative;
+    height: 100%;
+    margin: 10px 0 0 0;
+}
+
+.ant-tabs-bar {
+    padding: 0 0 0 10px;
+}
+.ant-tabs-content {
+    padding: 0 10px;
+}
+.ant-tabs-nav-container {
+    font-size: 13px;
+}
+.ant-dropdown-menu-item {
+    font-size: 13px;
+}
+
+.cell-right {
+    text-align: right;
+}
+.cell-center {
+    text-align: center;
+}
+.cell-overflow {
+    width:100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.rt-table {
+    font-size: 12px;
+}
+.rt-tr .rt-td:not(:last-child) {
+    padding: 8px 5px;
+}
+.rt-tr .rt-td:last-child {
+    padding: 5px;
+}
+
+.rt-tr .rt-td:last-child button.ant-btn {
+    font-size: 11px;
+    padding: 4px 8px;
+    height: 24px;
+    line-height: 14px;
+}
+
+.modalInput {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 5px 2px;
+}
+
+#tabExtras {
+    margin-right: 10px;
+}
+
+#rvmInfo {
+    padding-left: 5px;
+    font-size: 13px;
+}
+
+#workspace, #workspace-labels {
+    display: block;
+    margin: auto;
+    border:1px solid #000;
+}
+#workspace-labels {
+    border-bottom: 0px;
+}
+
+#logger {
+    font-size: 12px;
+    white-space: pre;
+    overflow-x: scroll;
+    height: 100%;
+    background:#222;
+    color: #ddd;
+}
+
+#appDetails, #winDetails {
+    display: none;
+    position: absolute;
+    font-size: 11px;
+    white-space: pre;
+    background: #ccc;
+    border: 1px solid #777;
+    border-radius: 5px;
+    padding: 5px;
+    overflow-y: scroll;
+}
+
+#appDetails.showing, #winDetails.showing {
+    display: flex;
+    top: 20%;
+    left: 25%;
+    bottom: 20%;
+    right: 25%;
+    z-index: 10;
+}
+
+#appDetailsClose, #winDetailsClose {
+    position: fixed;
+    right: 28%;
+    top: 23%;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#appLaunchForm.error p {
+    color: red;
+}

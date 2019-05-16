@@ -1,12 +1,14 @@
 # OpenFin Process Manager Demo
 
 ## Overview
-Process Manager demonstrates an HTML5 application that has privileged access to the operating system using OpenFin. The application displays statistics about different applications running in OpenFin, including CPU and memory. Additionally, a process can be terminated by clicking the **End Task** button.
+Process Manager demonstrates an HTML5 application that has privileged access to the operating system using OpenFin. The application displays statistics about different applications running in OpenFin, including CPU and memory.  It also displays all OpenFin windows running on the desktop.  You can launch the chrome debugger for any app/window as well as rescue a window that's off screen.
 
 ### Features
-* Discover applications running in OpenFin
-* Print CPU Usage and Memory consumption
+* Display all applications running in OpenFin with CPU Usage and Memory consumption
+* Display all windows running in OpenFin with size/position
+* Debug Applications/Windows
 * Terminate Applications
+* Visualize open window positions on the desktop
 
 ## Launch
 ### OpenFin Installer
@@ -17,11 +19,9 @@ Process Manager demonstrates an HTML5 application that has privileged access to 
 ### Run Locally
 * Make sure you have [node](https://nodejs.org/en/) installed.
 * Clone this repository.
-* Open a command-line terminal and navigate to the **app-launchpad** directory.
-* In the terminal, run `npm install`.
-* After all packages have been installed, run `node server`.
-* Download a locally running version with this [Local Process Manager Installer link](https://install.openfin.co/download?fileName=process-manager-local&config=http://localhost:5040/app_local.json).
-* Unzip and run the installer.
+* Open a command-line terminal and run `npm install`.
+* After all packages have been installed, run `npm run build`.
+* After the application is built, run `npm run start`.
 
 ## Disclaimers
 * This is a starter example and intended to demonstrate to app providers a sample of how to approach an implementation. There are potentially other ways to approach it and alternatives could be considered. 

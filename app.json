@@ -1,29 +1,30 @@
 {
-  "default_icon": "default_icon.png",
-  "devtools_port": 9090,
-  "websocket_port": 9696,
-  "logging": true,
-  "startup_app": {
-    "name":"process-manager",
-    "version":"1.4.1",
-    "description":"Process Manager",
-    "url":"https://cdn.openfin.co/demos/process-manager/index.html",
-    "uuid":"process-manager",
-    "defaultHeight":800,
-    "defaultWidth":600,
-    "applicationIcon":"https://cdn.openfin.co/demos/process-manager/img/icon.ico",
-    "company":"OpenFin",
-    "autoShow":true
-  },
-  "runtime": {
-    "arguments": "",
-    "version": "stable"
-  },
-  "splashScreenImage": "https://cdn.openfin.co/demos/process-manager/splashscreen/splash_process.png",
-  "shortcut": {
-    "company": "OpenFin",
-    "description": "OpenFin Process Manager",
-    "icon": "https://cdn.openfin.co/demos/process-manager/img/icon.ico",
-    "name": "Process Manager"
-  }
+    "default_icon": "default_icon.png",
+    "licenseKey": "64605fac-add3-48a0-8710-64b38e96a2dd",
+    "devtools_port": 9090,
+    "websocket_port": 9696,
+    "logging": true,
+    "startup_app": {
+        "name": "process-manager",
+        "version": "1.7.3",
+        "description": "Process Manager",
+        "url": "ROOT_URL/index.html",
+        "uuid": "process-manager",
+        "defaultHeight": 800,
+        "defaultWidth": 600,
+        "applicationIcon": "ROOT_URL/img/proc-mgr-icon.png",
+        "company": "OpenFin",
+        "autoShow": true
+    },
+    "runtime": {
+        "arguments": "",
+        "version": "stable"
+    },
+    "splashScreenImage": "ROOT_URL/img/proc-mgr-splash.png",
+    "shortcut": {
+        "company": "OpenFin",
+        "description": "OpenFin Process Manager",
+        "icon": "ROOT_URL/img/proc-mgr-icon.ico",
+        "name": "Process Manager"
+    }
 }
