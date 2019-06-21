@@ -1,21 +1,50 @@
 import * as React from 'react';
 import ReactTable from 'react-table';
+import treeTableHOC from 'react-table/lib/hoc/treeTable';
+
 import { Button } from 'antd';
 
 import 'react-table/react-table.css';
 
 import './interfaces';
 import { WindowDetail } from 'openfin/_v2/api/system/window';
-import { EntityInfo } from 'openfin/_v2/api/system/entity';
+import Bounds from 'openfin/_v2/api/window/bounds';
+import { _Window } from 'openfin/_v2/api/window/window';
+
+const TreeTable = treeTableHOC(ReactTable);
 
 interface WindowListProps {
     polling?: boolean;
 }
 interface WindowInfoState {
-    data: WindowDetails[];
+    data: WindowDetails2[];
+    expanded: {}
 }
 
 interface WindowDetails extends WindowDetail {
+    uuid: string;
+    name: string;
+    url: string;
+    parentName: string;
+    parentUUID: string;
+    childCount: number;
+    windowInfo: WindowInfo;
+    showing: boolean;
+}
+
+interface ParentWindow {
+    uuid: string;
+    name: string;
+    url: string;
+    parentName: string;
+    parentUUID: string;
+    childCount: number;
+    windowInfo: WindowInfo;
+    showing: boolean;
+    subRows: WindowDetails2[]
+}
+
+interface WindowDetails2 {
     uuid: string;
     name: string;
     url: string;
@@ -48,9 +77,13 @@ export class WindowList extends React.Component<WindowListProps, {}> {
 
     columns = [
         { 
+            Header: 'UUID', headerStyle: { textAlign: "left" }, width: 200, accessor:'parentUUID',
+            Cell: c => <div className="cell-overflow" title={c.value}>{c.value}</div>
+        },
+        { 
             Header: 'Window', id: 'name', minWidth: 200, headerStyle: { textAlign: "left" }, accessor: (inf) => {
-                if (inf.parentName) {
-                    return ` - ${inf.name} (${inf.parentName})`;
+                if (inf.parentName && inf.parentName !== inf.name) {
+                    return ` - ${inf.name}`;
                 } else if (inf.name && inf.name !== '') {
                     return inf.name;
                 } else {
@@ -77,10 +110,10 @@ export class WindowList extends React.Component<WindowListProps, {}> {
         { Header: 'Children', width: 60, className: 'cell-center', accessor: 'childCount'},
         { Header: 'Actions', width: 135, className: 'cell-center', Cell: cellInfo => (
             <ButtonGroup>
-                <Button title="Launch Debugger" type="primary" icon="code" onClick={(e) => this.launchDebugger(cellInfo.original)}></Button>
-                <Button title="Rescue Offscreen Window" type="primary" icon="medicine-box" onClick={(e) => this.centerWindow(cellInfo.original)}></Button>
-                <Button title="Show Window Info" type="primary" icon="info-circle" onClick={(e) => this.showWindowInfo(cellInfo.original)}></Button>
-                <Button title="Close Window" type="primary" icon="close-circle" onClick={(e) => this.closeWindow(cellInfo.original)}></Button>
+                <Button href="" title="Launch Debugger" type="primary" icon="code" onClick={(e) => this.launchDebugger(cellInfo.original)}></Button>
+                <Button href="" title="Rescue Offscreen Window" type="primary" icon="medicine-box" onClick={(e) => this.centerWindow(cellInfo.original)}></Button>
+                <Button href="" title="Show Window Info" type="primary" icon="info-circle" onClick={(e) => this.showWindowInfo(cellInfo.original)}></Button>
+                <Button href="" title="Close Window" type="primary" icon="close-circle" onClick={(e) => this.closeWindow(cellInfo.original)}></Button>
             </ButtonGroup>
         )}
     ];
@@ -95,18 +128,28 @@ export class WindowList extends React.Component<WindowListProps, {}> {
     }
 
     render() {
-        return <ReactTable
+        return <TreeTable
             data={(this.state as WindowInfoState).data}
             columns={this.columns}
             minRows={15}
+            multiSort={false}
             showPagination={false}
             style={{
                 height: "calc(100vh - 79px)"
             }}
             className="-striped -highlight"
+            pivotBy={["parentUUID"]}
+            onExpandedChange={newExpanded => this.onExpandedChange(newExpanded)}
+            expanded={(this.state as WindowInfoState).expanded}
        />;
     }
 
+    onExpandedChange(newExpanded) {
+        this.setState({
+          expanded: newExpanded
+        });
+    }
+      
     launchDebugger(win:WindowDetails):void {
         console.log('showing dev tools for window: ' + JSON.stringify(win));
         fin.System.showDeveloperTools({ uuid: win.uuid||'', name: win.name||''});
@@ -138,7 +181,7 @@ export class WindowList extends React.Component<WindowListProps, {}> {
         w.close();
     }
 
-    getWindowPositionInfo(win:WindowDetail) {
+    getWindowPositionInfo2(win:Bounds) {
         const info = {
             size: '',
             position: `(${win.top},${win.left})`,
@@ -150,33 +193,60 @@ export class WindowList extends React.Component<WindowListProps, {}> {
         return info;
     }
 
+    private async makeWindowInfo(win:_Window, childCount:number):Promise<WindowDetails2> {
+        const winfo = await win.getInfo();
+        const parWin = await win.getParentWindow()
+        const bounds = await win.getBounds();
+        const isShowing = await win.isShowing();
+        const w = Object.assign({}, {
+            uuid: win.identity.uuid!, 
+            name: win.identity.name!,
+            url: winfo.url, 
+            parentName: parWin.identity.name!,
+            parentUUID: parWin.identity.uuid, 
+            childCount: childCount,
+            windowInfo: this.getWindowPositionInfo2(bounds),
+            showing: isShowing
+        });
+        return w;
+    }
+
     private async pollForWindows() {
         if (this.props.polling) {
-            const winList:WindowDetails[] = [];
-            const list = await fin.System.getAllWindows();
-            const allWins = list.map(w => [w.mainWindow!].concat(w.childWindows!).map(cw => 
-                Object.assign(cw, {
-                    uuid: w.uuid!, 
-                    name: cw.name || '',
-                    url: '', 
-                    parentName: '', 
-                    parentUUID: '', 
-                    childCount: w.childWindows!.length,
-                    windowInfo: this.getWindowPositionInfo(cw),
-                    showing: true
-                }))
-            ).reduce( (p,c) => p.concat(c), []);
-            for (const w of allWins) {
-                const fInfo:EntityInfo = await new Promise<EntityInfo>(r => fin.desktop.Frame.wrap(w.uuid!, w.name!).getInfo(r));
-                w.parentName = fInfo.parent.name||'';
-                w.parentUUID = fInfo.parent.uuid;
-                const ofWin = await fin.Window.wrap(w);
-                const info = await ofWin.getInfo();
-                w.url = info.url;
-                w.showing = await ofWin.isShowing();
-                winList.push(w);
+            let winList2:ParentWindow[] = [];
+            const apps = await fin.System.getAllApplications();
+            for (let i=0; i<apps.length; i++) {
+                const appInfo = apps[i];
+                const uuid = appInfo.uuid;
+                const app = fin.Application.wrapSync(appInfo);
+                const mWin = await app.getWindow();
+                const wins = await app.getChildWindows();
+                const mWinfo = await this.makeWindowInfo(mWin, wins.length);
+                const childs:WindowDetails2[] = [];
+                for(let j=0; j<wins.length; j++) {
+                    const win = wins[j];
+                    const w = await this.makeWindowInfo(win, wins.length);
+                    childs.push(w);
+                }
+                const wchilds = Object.assign(mWinfo, { subRows: childs});
+                winList2.push(wchilds);
             }
-            this.setState({ data: winList });
+            // sort list by main windows
+            winList2 = winList2.sort( (a,b) => {
+                return a.parentUUID.localeCompare(b.parentUUID);
+            });
+            // flatten for list
+            const newList:WindowDetails2[] = [];
+            for (let i=0; i<winList2.length; i++) {
+                const w = winList2[i];
+                newList.push(w);
+                for (let j=0; j<w.subRows.length; j++) {
+                    newList.push(w.subRows[j]);
+                }
+                // newList.concat(w.subRows);
+            }
+            this.setState({ data: newList });
+            console.log(newList);
         }
     }
 }

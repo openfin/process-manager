@@ -65,9 +65,9 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
         }},
         { Header: 'Actions', width: 100, className: 'cell-center', Cell: cellInfo => (
             <ButtonGroup>
-                <Button title="Launch Debugger" type="primary" icon="code" onClick={(e) => this.launchDebugger(cellInfo.original.process)}></Button>
-                <Button title="Show App Info" type="primary" icon="info-circle" onClick={(e) => this.showAppInfo(cellInfo.original.process)}></Button>
-                <Button title="Close App" type="primary" icon="close-circle" onClick={(e) => this.closeApp(cellInfo.original.process)}></Button>
+                <Button href="" title="Launch Debugger" type="primary" icon="code" onClick={(e) => this.launchDebugger(cellInfo.original.process)}></Button>
+                <Button href="" title="Show App Info" type="primary" icon="info-circle" onClick={(e) => this.showAppInfo(cellInfo.original.process)}></Button>
+                <Button href="" title="Close App" type="primary" icon="close-circle" onClick={(e) => this.closeApp(cellInfo.original.process)}></Button>
             </ButtonGroup>
         )}
     ];
@@ -89,6 +89,7 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
             style={{
                 height: "calc(100vh - 79px)"
             }}
+            defaultSorted={[{id: "name", desc: false}]}
             className="-striped -highlight"
        />;
     }

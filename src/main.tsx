@@ -174,7 +174,7 @@ export class App extends React.Component<AppProps, {}> {
             </Menu>;
             return <div id="tabExtras">
                 <Dropdown overlay={procMenu} trigger={['click']}>
-                    <Button type="default" icon="setting"></Button>
+                    <Button href="" type="default" icon="setting"></Button>
                 </Dropdown>
                 {defaultExtras}
             </div>;

@@ -35,8 +35,8 @@ export class LogList extends React.Component<LogListProps, {}> {
         { Header: 'Size', accessor: 'formattedSize', width: 80, className: 'cell-center'},
         { Header: 'Actions', width: 70, className: 'cell-center', Cell: cellInfo => (
             <ButtonGroup>
-                <Button title="View Log" type="primary" icon="exception" onClick={(e) => this.showLog(cellInfo.original)}></Button>
-                <Button title="Email Log" type="primary" icon="mail" onClick={(e) => this.emailLog(cellInfo.original)}></Button>
+                <Button href="" title="View Log" type="primary" icon="exception" onClick={(e) => this.showLog(cellInfo.original)}></Button>
+                <Button href="" title="Email Log" type="primary" icon="mail" onClick={(e) => this.emailLog(cellInfo.original)}></Button>
             </ButtonGroup>
         )}
     ];
@@ -104,12 +104,12 @@ export class LogList extends React.Component<LogListProps, {}> {
             const log = list[i];
             results[results.length] = this.makeProcessedLogInfo(log);
         }
-        results.sort((a: LogFile, b: LogFile) => {
-            if (a.date === b.date) {
-                return 0;
-            }
-            return (a.date > b.date) ? -1 : 1;
-        });
+        // results.sort((a: LogFile, b: LogFile) => {
+        //     if (a.date === b.date) {
+        //         return 0;
+        //     }
+        //     return (a.date > b.date) ? -1 : 1;
+        // });
         return results;
     }
 
