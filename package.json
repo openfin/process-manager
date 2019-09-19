@@ -9,6 +9,7 @@
     "react-table": "^6.10.0"
   },
   "devDependencies": {
+    "@types/node": "^12.7.5",
     "@types/openfin": "^37.0.2",
     "@types/react": "^16.8.22",
     "@types/react-dom": "^16.8.4",
