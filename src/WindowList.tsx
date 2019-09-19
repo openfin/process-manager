@@ -83,7 +83,7 @@ export class WindowList extends React.Component<WindowListProps, {}> {
             Cell: c => <div className="cell-overflow" title={c.value}>{c.value}</div>
         },
         { 
-            Header: 'Window', id: 'name', minWidth: 190, headerStyle: { textAlign: "left" }, accessor: (inf) => {
+            Header: 'Window', id: 'name', minWidth: 180, headerStyle: { textAlign: "left" }, accessor: (inf) => {
                 if (inf.parentName && inf.parentName !== inf.name) {
                     return ` - ${inf.name}`;
                 } else if (inf.name && inf.name !== '') {
@@ -96,7 +96,7 @@ export class WindowList extends React.Component<WindowListProps, {}> {
         },
         { 
             Header: 'URL', 
-            minWidth: 190, 
+            minWidth: 180, 
             headerStyle: { textAlign: "left" }, 
             accessor: 'url', 
             Cell: c => <div className="cell-overflow" title={c.value}>{c.value}</div>
@@ -116,13 +116,13 @@ export class WindowList extends React.Component<WindowListProps, {}> {
             return sizeInfo;
         }},
         { Header: 'Children', width: 60, className: 'cell-center', accessor: 'childCount'},
-        { Header: 'Actions', width: 160, className: 'cell-center', Cell: cellInfo => (
+        { Header: 'Actions', width: 170, className: 'cell-center', Cell: cellInfo => (
             <ButtonGroup>
                 <Button href="#" title="Launch Debugger" type="primary" icon="code" onClick={(e) => this.launchDebugger(cellInfo.original)}></Button>
                 <Button href="#" title="Rescue Offscreen Window" type="primary" icon="medicine-box" onClick={(e) => this.rescueWindow(cellInfo.original)}></Button>
-                <Button href="#" title="Show Window" type="primary" icon={this.getShowWindowIcon(cellInfo.original)} onClick={(e) => this.showWindow(cellInfo.original)}></Button>
+                <Button href="#" title="Show Window" type="primary" disabled={this.getShowWindowDisabled(cellInfo.original)} icon={this.getShowWindowIcon(cellInfo.original)} onClick={(e) => this.showWindow(cellInfo.original)}></Button>
                 <Button href="#" title="Show Window Info" type="primary" icon="info-circle" onClick={(e) => this.showWindowInfo(cellInfo.original)}></Button>
-                <Button href="#" title="Close Window" type="primary" icon="close-circle" onClick={(e) => this.closeWindow(cellInfo.original)}></Button>
+                <Button href="#" title="Close Window" type="primary" disabled={this.getShowWindowDisabled(cellInfo.original)} icon="close-circle" onClick={(e) => this.closeWindow(cellInfo.original)}></Button>
             </ButtonGroup>
         )}
     ];
@@ -162,11 +162,7 @@ export class WindowList extends React.Component<WindowListProps, {}> {
     getShowWindowIcon(win:WindowDetails) {
         return (win.showing) ? 'eye-invisible' : 'eye';
     }
-      
-    getShowWindowDisabled(win:WindowDetails) {
-        return (win.showing) ? 'disabled' : '';
-    }
-
+    
     launchDebugger(win:WindowDetails):void {
         console.log('showing dev tools for window: ' + JSON.stringify(win));
         fin.System.showDeveloperTools({ uuid: win.uuid||'', name: win.name||''});
@@ -195,6 +191,10 @@ export class WindowList extends React.Component<WindowListProps, {}> {
                 ofwin.bringToFront();    
             }
         }
+    }
+
+    getShowWindowDisabled(win:WindowDetails):boolean {
+        return (this.UUID === win.uuid);
     }
 
     showWindowInfo(win:WindowDetails) {
@@ -277,10 +277,8 @@ export class WindowList extends React.Component<WindowListProps, {}> {
                 for (let j=0; j<w.subRows.length; j++) {
                     newList.push(w.subRows[j]);
                 }
-                // newList.concat(w.subRows);
             }
             this.setState({ data: newList });
-            console.log(newList);
         }
     }
 }

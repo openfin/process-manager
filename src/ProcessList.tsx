@@ -55,8 +55,8 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
             },
             Cell: c => <div className="cell-overflow" title={c.value}>{c.value}</div>
         },
-        { Header: 'URL', headerStyle: { textAlign: "left" }, accessor: 'info.manifest.startup_app.url', minWidth: 200, Cell: c => <div className="cell-overflow"title={c.value}>{c.value}</div>},
-        { Header: 'Manifest', headerStyle: { textAlign: "left" }, accessor: 'info.manifestUrl', minWidth: 200, Cell: c => <div className="cell-overflow"title={c.value}>{c.value}</div>},
+        { Header: 'URL', headerStyle: { textAlign: "left" }, accessor: 'info.manifest.startup_app.url', minWidth: 195, Cell: c => <div className="cell-overflow"title={c.value}>{c.value}</div>},
+        { Header: 'Manifest', headerStyle: { textAlign: "left" }, accessor: 'info.manifestUrl', minWidth: 195, Cell: c => <div className="cell-overflow"title={c.value}>{c.value}</div>},
         { Header: 'Runtime', accessor: 'info.runtime.version', width: 80, className: 'cell-center'},
         { Header: 'CPU', id: 'cpu', width: 50, className: 'cell-center', accessor: (inf) => {
             return (inf.process.cpuUsage||0.0).toFixed(1) + '%';
@@ -64,7 +64,7 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
         { Header: 'Mem', id: 'mem', width: 60, className: 'cell-center', accessor: (inf) => {
             return formatBytes(inf.process.workingSetSize||0.0, 1);
         }},
-        { Header: 'Actions', width: 100, className: 'cell-center', Cell: cellInfo => (
+        { Header: 'Actions', width: 110, className: 'cell-center', Cell: cellInfo => (
             <ButtonGroup>
                 <Button href="#" title="Launch Debugger" type="primary" icon="code" onClick={(e) => this.launchDebugger(cellInfo.original.process)}></Button>
                 <Button href="#" title="Show App Info" type="primary" icon="info-circle" onClick={(e) => this.showAppInfo(cellInfo.original.process)}></Button>
