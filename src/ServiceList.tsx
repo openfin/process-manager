@@ -41,7 +41,7 @@ export class ServiceList extends React.Component<ServiceListProps, {}> {
         { Header: 'Channel ID', headerStyle: { textAlign: "left" }, accessor: 'channelId', minWidth: 300},
         { Header: 'Actions', width: 100, className: 'cell-center', Cell: cellInfo => (
             <ButtonGroup>
-                <Button href="" title="Launch Debugger" type="primary" icon="code" onClick={(e) => this.launchDebugger(cellInfo.original.uuid)}></Button>
+                <Button href="#" title="Launch Debugger" type="primary" icon="code" onClick={(e) => this.launchDebugger(cellInfo.original.uuid)}></Button>
             </ButtonGroup>
         )}        
     ];

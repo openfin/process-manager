@@ -67,12 +67,14 @@ const ButtonGroup = Button.Group;
 export class WindowList extends React.Component<WindowListProps, {}> {
 
     timer = 0;
-
+    UUID = '';
+    
     constructor(props) {
         super(props);
         this.state = {
             data: []
         };
+        this.UUID = fin.Application.getCurrentSync().identity.uuid;
     }
 
     columns = [
@@ -81,7 +83,7 @@ export class WindowList extends React.Component<WindowListProps, {}> {
             Cell: c => <div className="cell-overflow" title={c.value}>{c.value}</div>
         },
         { 
-            Header: 'Window', id: 'name', minWidth: 200, headerStyle: { textAlign: "left" }, accessor: (inf) => {
+            Header: 'Window', id: 'name', minWidth: 190, headerStyle: { textAlign: "left" }, accessor: (inf) => {
                 if (inf.parentName && inf.parentName !== inf.name) {
                     return ` - ${inf.name}`;
                 } else if (inf.name && inf.name !== '') {
@@ -92,7 +94,13 @@ export class WindowList extends React.Component<WindowListProps, {}> {
             },
             Cell: c => <div className="cell-overflow" title={c.value}>{c.value}</div>
         },
-        { Header: 'URL', minWidth: 200, headerStyle: { textAlign: "left" }, accessor: 'url', Cell: c => <div className="cell-overflow" title={c.value}>{c.value}</div>},
+        { 
+            Header: 'URL', 
+            minWidth: 190, 
+            headerStyle: { textAlign: "left" }, 
+            accessor: 'url', 
+            Cell: c => <div className="cell-overflow" title={c.value}>{c.value}</div>
+        },
         { Header: 'Showing', width: 60, id: 'showing', className: 'cell-center', accessor: (inf) => {
             if (inf.showing) {
                 return 'Yes';
@@ -108,12 +116,13 @@ export class WindowList extends React.Component<WindowListProps, {}> {
             return sizeInfo;
         }},
         { Header: 'Children', width: 60, className: 'cell-center', accessor: 'childCount'},
-        { Header: 'Actions', width: 135, className: 'cell-center', Cell: cellInfo => (
+        { Header: 'Actions', width: 160, className: 'cell-center', Cell: cellInfo => (
             <ButtonGroup>
-                <Button href="" title="Launch Debugger" type="primary" icon="code" onClick={(e) => this.launchDebugger(cellInfo.original)}></Button>
-                <Button href="" title="Rescue Offscreen Window" type="primary" icon="medicine-box" onClick={(e) => this.centerWindow(cellInfo.original)}></Button>
-                <Button href="" title="Show Window Info" type="primary" icon="info-circle" onClick={(e) => this.showWindowInfo(cellInfo.original)}></Button>
-                <Button href="" title="Close Window" type="primary" icon="close-circle" onClick={(e) => this.closeWindow(cellInfo.original)}></Button>
+                <Button href="#" title="Launch Debugger" type="primary" icon="code" onClick={(e) => this.launchDebugger(cellInfo.original)}></Button>
+                <Button href="#" title="Rescue Offscreen Window" type="primary" icon="medicine-box" onClick={(e) => this.rescueWindow(cellInfo.original)}></Button>
+                <Button href="#" title="Show Window" type="primary" icon={this.getShowWindowIcon(cellInfo.original)} onClick={(e) => this.showWindow(cellInfo.original)}></Button>
+                <Button href="#" title="Show Window Info" type="primary" icon="info-circle" onClick={(e) => this.showWindowInfo(cellInfo.original)}></Button>
+                <Button href="#" title="Close Window" type="primary" icon="close-circle" onClick={(e) => this.closeWindow(cellInfo.original)}></Button>
             </ButtonGroup>
         )}
     ];
@@ -149,18 +158,43 @@ export class WindowList extends React.Component<WindowListProps, {}> {
           expanded: newExpanded
         });
     }
+
+    getShowWindowIcon(win:WindowDetails) {
+        return (win.showing) ? 'eye-invisible' : 'eye';
+    }
       
+    getShowWindowDisabled(win:WindowDetails) {
+        return (win.showing) ? 'disabled' : '';
+    }
+
     launchDebugger(win:WindowDetails):void {
         console.log('showing dev tools for window: ' + JSON.stringify(win));
         fin.System.showDeveloperTools({ uuid: win.uuid||'', name: win.name||''});
     }
 
-    async centerWindow(win:WindowDetails) {
-        console.log('centering window: ' + JSON.stringify(win));
+    async rescueWindow(win:WindowDetails) {
+        console.log('rescueing window: ' + JSON.stringify(win));
         const ofwin = await fin.Window.wrap({ uuid: win.uuid||'', name: win.name||''});
         ofwin.moveTo(100, 100);
         ofwin.focus();
         ofwin.bringToFront();
+    }
+
+    async showWindow(win:WindowDetails) {
+        // don't toggle our own visibility !!
+        if (this.UUID !== win.uuid) {
+            if (win.showing) {
+                console.log('showing window: ' + JSON.stringify(win));
+                const ofwin = await fin.Window.wrap({ uuid: win.uuid||'', name: win.name||''});
+                ofwin.hide();
+            } else {
+                console.log('showing window: ' + JSON.stringify(win));
+                const ofwin = await fin.Window.wrap({ uuid: win.uuid||'', name: win.name||''});
+                ofwin.show();
+                ofwin.focus();
+                ofwin.bringToFront();    
+            }
+        }
     }
 
     showWindowInfo(win:WindowDetails) {

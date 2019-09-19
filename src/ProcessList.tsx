@@ -25,10 +25,11 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
     processCache: {[key:string]:AppInfo} = {};
 
     static async closeAllApps() {
+        const myUUID = fin.Application.getCurrentSync().identity.uuid;
         const procs = await fin.System.getProcessList();
         for (let i = 0; i < procs.length; i++) {
             const uuid = procs[i].uuid||'';
-            if (uuid !== '' && uuid !== 'process-manager') {
+            if (uuid !== '' && uuid !== myUUID) {
                 const app = await fin.Application.wrap({ uuid});
                 app.close(true);
             }
@@ -65,9 +66,9 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
         }},
         { Header: 'Actions', width: 100, className: 'cell-center', Cell: cellInfo => (
             <ButtonGroup>
-                <Button href="" title="Launch Debugger" type="primary" icon="code" onClick={(e) => this.launchDebugger(cellInfo.original.process)}></Button>
-                <Button href="" title="Show App Info" type="primary" icon="info-circle" onClick={(e) => this.showAppInfo(cellInfo.original.process)}></Button>
-                <Button href="" title="Close App" type="primary" icon="close-circle" onClick={(e) => this.closeApp(cellInfo.original.process)}></Button>
+                <Button href="#" title="Launch Debugger" type="primary" icon="code" onClick={(e) => this.launchDebugger(cellInfo.original.process)}></Button>
+                <Button href="#" title="Show App Info" type="primary" icon="info-circle" onClick={(e) => this.showAppInfo(cellInfo.original.process)}></Button>
+                <Button href="#" title="Close App" type="primary" icon="close-circle" onClick={(e) => this.closeApp(cellInfo.original.process)}></Button>
             </ButtonGroup>
         )}
     ];

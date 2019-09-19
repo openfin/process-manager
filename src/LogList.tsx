@@ -35,8 +35,8 @@ export class LogList extends React.Component<LogListProps, {}> {
         { Header: 'Size', accessor: 'formattedSize', width: 80, className: 'cell-center'},
         { Header: 'Actions', width: 70, className: 'cell-center', Cell: cellInfo => (
             <ButtonGroup>
-                <Button href="" title="View Log" type="primary" icon="exception" onClick={(e) => this.showLog(cellInfo.original)}></Button>
-                <Button href="" title="Email Log" type="primary" icon="mail" onClick={(e) => this.emailLog(cellInfo.original)}></Button>
+                <Button href="#" title="View Log" type="primary" icon="exception" onClick={(e) => this.showLog(cellInfo.original)}></Button>
+                <Button href="#" title="Email Log" type="primary" icon="mail" onClick={(e) => this.emailLog(cellInfo.original)}></Button>
             </ButtonGroup>
         )}
     ];
