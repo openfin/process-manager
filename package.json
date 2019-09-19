@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "OpenFin Process Manager",
   "dependencies": {
-    "antd": "^3.8.2",
+    "antd": "^3.23.3",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-table": "^6.10.0"
@@ -13,18 +13,18 @@
     "@types/react": "^16.8.22",
     "@types/react-dom": "^16.8.4",
     "@types/react-table": "^6.8.3",
-    "copy-webpack-plugin": "^4.5.2",
-    "css-loader": "^1.0.0",
-    "express": "^4.16.3",
-    "gts": "^1.0.0",
+    "copy-webpack-plugin": "^4.6.0",
+    "css-loader": "^1.0.1",
+    "express": "^4.17.1",
+    "gts": "^1.1.0",
     "hadouken-js-adapter": "^0.39.1",
-    "less": "^3.8.1",
+    "less": "^3.10.3",
     "less-loader": "^4.1.0",
     "style-loader": "^0.22.1",
-    "ts-loader": "^4.4.2",
-    "typescript": "^3.5.2",
-    "webpack": "^4.16.2",
-    "webpack-cli": "^3.1.0"
+    "ts-loader": "^4.5.0",
+    "typescript": "^3.6.3",
+    "webpack": "^4.40.2",
+    "webpack-cli": "^3.3.9"
   },
   "scripts": {
     "all": "npm run clean && npm run build && npm run start",
