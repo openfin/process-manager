@@ -31,7 +31,7 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
             const uuid = procs[i].uuid||'';
             if (uuid !== '' && uuid !== myUUID) {
                 const app = await fin.Application.wrap({ uuid});
-                app.close(true);
+                app.quit(true);
             }
         }
     }

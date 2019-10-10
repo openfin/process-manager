@@ -8,7 +8,7 @@ import 'react-table/react-table.css';
 
 import './interfaces';
 import { WindowDetail } from 'openfin/_v2/api/system/window';
-import Bounds from 'openfin/_v2/api/window/bounds';
+import { Bounds } from 'openfin/_v2/shapes';
 import { _Window } from 'openfin/_v2/api/window/window';
 
 const TreeTable = treeTableHOC(ReactTable);
@@ -251,19 +251,22 @@ export class WindowList extends React.Component<WindowListProps, {}> {
             const apps = await fin.System.getAllApplications();
             for (let i=0; i<apps.length; i++) {
                 const appInfo = apps[i];
-                const uuid = appInfo.uuid;
-                const app = fin.Application.wrapSync(appInfo);
-                const mWin = await app.getWindow();
-                const wins = await app.getChildWindows();
-                const mWinfo = await this.makeWindowInfo(mWin, wins.length);
-                const childs:WindowDetails2[] = [];
-                for(let j=0; j<wins.length; j++) {
-                    const win = wins[j];
-                    const w = await this.makeWindowInfo(win, wins.length);
-                    childs.push(w);
+                try {
+                    const app = fin.Application.wrapSync(appInfo);
+                    const mWin = await app.getWindow();
+                    const wins = await app.getChildWindows();
+                    const mWinfo = await this.makeWindowInfo(mWin, wins.length);
+                    const childs:WindowDetails2[] = [];
+                    for(let j=0; j<wins.length; j++) {
+                        const win = wins[j];
+                        const w = await this.makeWindowInfo(win, wins.length);
+                        childs.push(w);
+                    }
+                    const wchilds = Object.assign(mWinfo, { subRows: childs});
+                    winList2.push(wchilds);
+                } catch(e) {
+                    console.error(`error polling for apps, problem app uuid: ${appInfo.uuid}`, e);
                 }
-                const wchilds = Object.assign(mWinfo, { subRows: childs});
-                winList2.push(wchilds);
             }
             // sort list by main windows
             winList2 = winList2.sort( (a,b) => {

@@ -4,16 +4,16 @@
   "description": "OpenFin Process Manager",
   "dependencies": {
     "antd": "^3.23.3",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "react-table": "^6.10.0"
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-table": "^6.10.3"
   },
   "devDependencies": {
     "@types/node": "^12.7.5",
-    "@types/openfin": "^37.0.2",
-    "@types/react": "^16.8.22",
-    "@types/react-dom": "^16.8.4",
-    "@types/react-table": "^6.8.3",
+    "@types/openfin": "^45.0.0",
+    "@types/react": "^16.9.2",
+    "@types/react-dom": "^16.9.0",
+    "@types/react-table": "^6.8.5",
     "copy-webpack-plugin": "^4.6.0",
     "css-loader": "^1.0.1",
     "express": "^4.17.1",
