@@ -1,58 +1,25 @@
 {
-  "name": "process-manager",
-  "version": "1.0.0",
-  "description": "OpenFin Process Manager",
-  "dependencies": {
-    "antd": "^3.23.3",
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0",
-    "react-table": "^6.10.3"
-  },
-  "devDependencies": {
-    "@types/node": "^12.7.5",
-    "@types/openfin": "^45.0.0",
-    "@types/react": "^16.9.2",
-    "@types/react-dom": "^16.9.0",
-    "@types/react-table": "^6.8.5",
-    "copy-webpack-plugin": "^4.6.0",
-    "css-loader": "^1.0.1",
-    "express": "^4.17.1",
-    "gts": "^1.1.0",
-    "hadouken-js-adapter": "^0.39.1",
-    "less": "^3.10.3",
-    "less-loader": "^4.1.0",
-    "style-loader": "^0.22.1",
-    "ts-loader": "^4.5.0",
-    "typescript": "^3.6.3",
-    "webpack": "^4.40.2",
-    "webpack-cli": "^3.3.9"
-  },
-  "scripts": {
-    "all": "npm run clean && npm run build && npm run start",
-    "build": "webpack --mode development",
-    "start": "MODE=run node server.js",
-    "start:alpha": "MODE=run RUNTIME=alpha node server.js",
-    "start:beta": "MODE=run RUNTIME=beta node server.js",
-    "start:canary": "MODE=run RUNTIME=canary node server.js",
-    "serve": "node server.js",
-    "check": "gts check",
-    "clean": "gts clean",
-    "compile": "tsc -p .",
-    "fix": "gts fix",
-    "prepare": "npm run compile",
-    "pretest": "npm run compile",
-    "posttest": "npm run check"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/openfin/process-manager.git"
-  },
-  "keywords": [
-    "openfin"
-  ],
-  "license": "Apache2",
-  "bugs": {
-    "url": "https://github.com/openfin/process-manager/issues"
-  },
-  "homepage": "https://github.com/openfin/process-manager#readme"
+    "name": "process-manager2",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build && next export",
+        "start": "next start"
+    },
+    "dependencies": {
+        "@ant-design/icons": "4.3.0",
+        "antd": "4.8.5",
+        "next": "10.0.2",
+        "react": "17.0.1",
+        "react-dom": "17.0.1",
+        "react-resizable": "1.11.0"
+    },
+    "devDependencies": {
+        "@types/node": "14.14.9",
+        "@types/react": "17.0.0",
+        "@types/react-dom": "17.0.0",
+        "openfin-adapter": "17.54.32",
+        "typescript": "4.1.2"
+    }
 }

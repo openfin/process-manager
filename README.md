@@ -19,9 +19,8 @@ Process Manager demonstrates an HTML5 application that has privileged access to 
 ### Run Locally
 * Make sure you have [node](https://nodejs.org/en/) installed.
 * Clone this repository.
-* Open a command-line terminal and run `npm install`.
-* After all packages have been installed, run `npm run build`.
-* After the application is built, run `npm run start`.
+* Open a command-line terminal and run `yarn install`.
+* After all packages have been installed, run `yarn dev`.
 
 ## Disclaimers
 * This is a starter example and intended to demonstrate to app providers a sample of how to approach an implementation. There are potentially other ways to approach it and alternatives could be considered. 
