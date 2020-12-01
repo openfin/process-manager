@@ -5,7 +5,8 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build && next export",
-        "start": "next start"
+        "serve": "npx http-server ./out -p 3000",
+        "start": "yarn build && yarn serve"
     },
     "dependencies": {
         "@ant-design/icons": "4.3.0",
