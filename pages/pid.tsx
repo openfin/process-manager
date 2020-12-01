@@ -4,18 +4,18 @@ import { ViewHeader } from '../components/viewHeader'
 import { PIDView } from '../components/pidView'
 
 export default function PID() {
-    const [autoRefresh, setAutoRefresh] = useState(true)
     const [pid, setPID] = useState('');
-    useEffect(() => {
-        const url = new URL(window.location.href)
-        const pid = url.searchParams.get('pid')
-        setPID(pid);
-    });
-
+    const [autoRefresh, setAutoRefresh] = useState(true)
 
     const onRefreshToggle = (v: boolean) => {
         setAutoRefresh(v)
     }
+
+    // load pid value from URL ensuring it runs only once
+    useEffect(() => {
+        const pid = new URL(window.location.href).searchParams.get('pid')
+        setPID(pid);
+    }, []);
 
     return (
         <div>
