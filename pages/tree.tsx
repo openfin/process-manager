@@ -13,7 +13,7 @@ export default function Tree() {
 
   return (
     <div>
-      <PageHeader title="Applications" />
+      <PageHeader title="Process Manager - Applications" />
       <main>
         <ViewHeader checked={autoRefresh} onChange={onRefreshToggle}>
             <Button size="small">Open</Button>

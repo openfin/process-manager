@@ -19,7 +19,7 @@ export default function PID() {
 
     return (
         <div>
-            <PageHeader title={`PID: ${pid}`} />
+            <PageHeader title={`Process Manager - PID: ${pid}`} />
             <main>
                 <ViewHeader checked={autoRefresh} onChange={onRefreshToggle}></ViewHeader>
                 <PIDView pollForData={autoRefresh} pid={pid} />

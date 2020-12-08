@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getPIDMembers } from '../hooks/utils';
+import { getPIDEntities } from '../hooks/api';
 import { Table } from 'antd';
 
 export const PIDView = ({ pid, pollForData }) => {
@@ -40,7 +40,7 @@ export const PIDView = ({ pid, pollForData }) => {
     const pollPID = async () => {
         if (pollForData) {
             console.log('polling for PID: ' + pid)
-            const procList = await getPIDMembers();
+            const procList = await getPIDEntities(pid);
             setData(procList);
         }
     }

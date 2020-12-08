@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Modal, Table, Button } from 'antd';
-import { getProcessTree, getItemInfo } from '../hooks/utils';
+import { getProcessTree, getItemInfo, ProcessModel } from '../hooks/api';
 import { TableHeader } from './tableHeader';
 import { ProcessActions } from './processActions';
 import { PidLink } from './pidLink';
@@ -10,7 +10,7 @@ interface ProcessTreeProps {
 }
 
 interface ProcessTreeState {
-    data: Object[];
+    tree: ProcessModel;
     columns: any[];
     modalVisible: boolean;
     modalTitle: string;
@@ -36,13 +36,13 @@ export class ProcessTree extends React.Component<ProcessTreeProps, ProcessTreeSt
                     dataIndex: 'pid',
                     key: 'pid',
                     width: 150,
-                    render: (text, record) => <PidLink pid={record.pid} />,
+                    render: (text, record) => <PidLink pid={record.processInfo.pid} />,
                     fixed: 'left',
                     resizable: false,
                 },
                 {
                     title: 'Name',
-                    dataIndex: 'name',
+                    dataIndex: 'title',
                     key: 'name',
                     width: 350,
                 },
@@ -61,7 +61,7 @@ export class ProcessTree extends React.Component<ProcessTreeProps, ProcessTreeSt
                     resizable: false,
                 },
             ],
-            data: [],
+            tree: { applications: [] },
             modalTitle: '',
             modalVisible: false,
             modalContents: '',
@@ -93,11 +93,11 @@ export class ProcessTree extends React.Component<ProcessTreeProps, ProcessTreeSt
                 pagination={false}
                 columns={columns}
                 components={this.components}
-                dataSource={(this.state as ProcessTreeState).data}
+                dataSource={(this.state as ProcessTreeState).tree.applications}
                 scroll={{ x: (this.state as ProcessTreeState).scrollX, y: (this.state as ProcessTreeState).scrollY }}
                 size="small"
             />
-            <Modal title={(this.state as ProcessTreeState).modalTitle} visible={(this.state as ProcessTreeState).modalVisible} onCancel={this.hideModal.bind(this)} footer={[
+            <Modal className="firstcap" title={(this.state as ProcessTreeState).modalTitle} visible={(this.state as ProcessTreeState).modalVisible} onCancel={this.hideModal.bind(this)} footer={[
                 <Button key="1" onClick={this.hideModal.bind(this)}>Close</Button>
                 ]}>
                 <pre>{(this.state as ProcessTreeState).modalContents}</pre>
@@ -116,16 +116,14 @@ export class ProcessTree extends React.Component<ProcessTreeProps, ProcessTreeSt
 
     private async pollForApps() {
         if (this.props.pollForData) {
-            console.log('polling for apps')
-            const procList = await getProcessTree();
-            this.setState({ data: procList });
+            const procModel = await getProcessTree();
+            this.setState({ tree: procModel });
         }
     }
 
     async showInfo(item: any) {
-        console.log('asdf', item)
-        const info = await getItemInfo(item);
-        this.showModal(item.type, JSON.stringify(info, null, 4));
+        const info = await getItemInfo(item.identity);
+        this.showModal(`${item.identity.entityType} Info`, JSON.stringify(info, null, 4));
     }
 
     showModal(title: string, contents: string) {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getRVMInfo } from '../hooks/utils';
+import { getRVMInfo } from '../hooks/api';
 
 export const RVMInfo = () => {
     const [rvmVersion, setRVMVersion] = useState('x.x.x')

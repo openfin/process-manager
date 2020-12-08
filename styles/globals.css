@@ -47,3 +47,7 @@ menu li.rhs {
     height: 100%;
     cursor: col-resize;
 }
+
+.firstcap {
+    text-transform: capitalize;
+}

@@ -1,10 +1,10 @@
 import { Space, Button } from 'antd';
 import { CodeOutlined, MedicineBoxOutlined, InfoCircleOutlined, CloseCircleOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
-import { showDeveloperTools, closeItem, rescueWindow, toggleWindowVisibility } from '../hooks/utils';
+import { showDeveloperTools, closeItem, rescueWindow, toggleWindowVisibility } from '../hooks/api';
 
 export const ProcessActions = ({ item, infoHandler }) => {
     const showDevTools = () => {
-        showDeveloperTools(item);
+        showDeveloperTools(item.identity);
     }
 
     const showInfo = async () => {
@@ -12,19 +12,19 @@ export const ProcessActions = ({ item, infoHandler }) => {
     }
 
     const rescueWin = () => {
-        rescueWindow(item);
+        rescueWindow(item.identity);
     }
 
     const close = () => {
-        closeItem(item);
+        closeItem(item.identity);
     }
 
     const toggleWindowVis = () => {
-        toggleWindowVisibility(item, item.visible);
+        toggleWindowVisibility(item.identity, item.visible);
     }
 
     let winButtons = [];
-    if (item.type === 'window') {
+    if (item.identity.entityType === 'window') {
         winButtons = [
             <Button size="small" onClick={rescueWin} key={1}><MedicineBoxOutlined /></Button>,
             <Button size="small" onClick={toggleWindowVis} key={2}>{
