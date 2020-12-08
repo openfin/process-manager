@@ -146,7 +146,7 @@ export const getProcessTree = async():Promise<appProcessTree[]> => {
         const applicationProcessInfo: appProcessTree = {
             identity: {...app.identity, entityType: 'application'},
             url: info.manifestUrl,
-            title: app.identity.uuid || mainWin.identity.uuid || mainWin.identity.name,
+            title: app.identity.uuid,
             runtimeVersion,
             isPlatform: info.initialOptions["isPlatformController"],
             isRunning: running,

@@ -102,12 +102,11 @@ export const getPIDEntities = async (pid:number):Promise<EntityProcessDetails[]>
 
 // map between internal and exported interfaces
 const transformPSTree = async (procTree:finAPI.appProcessTree[]):Promise<ProcessModel> => {
-    let i = 0;
-    const newTree = procTree.map( a => {
+    let newTree = procTree.map( a => {
         let pid = a.processDetails ? a.processDetails.pid : 0;
         const appModel:AppProcessModel  = Object.assign({}, a, { 
             children: [], 
-            key: `${i++}`,
+            key: a.identity.uuid,
             processInfo: {
                 pid: pid,
             },
@@ -117,7 +116,7 @@ const transformPSTree = async (procTree:finAPI.appProcessTree[]):Promise<Process
             pid = w.processDetails ? w.processDetails.pid : 0;
             const winModel:WinProcessModel  = Object.assign({}, w, { 
                 children: [], 
-                key: `${i}_${j++}`,
+                key: `${a.identity.uuid}_${w.identity.name}`,
                 processInfo: {
                     pid: pid,
                 },
@@ -126,7 +125,7 @@ const transformPSTree = async (procTree:finAPI.appProcessTree[]):Promise<Process
             winModel.children = w.views.map( v => {
                 pid = v.processDetails ? v.processDetails.pid : 0;
                 const viewModel:ViewProcessModel  = Object.assign({}, v, { 
-                    key: `${i}_${j}_${k++}`, 
+                    key: `${a.identity.uuid}_${w.identity.name}_${v.identity.uuid}`, 
                     processInfo: {
                         pid: pid,
                     },
@@ -136,11 +135,20 @@ const transformPSTree = async (procTree:finAPI.appProcessTree[]):Promise<Process
             })
             delete winModel['views'];
             delete winModel['processDetails'];
+            winModel.children = winModel.children.sort((a, b) => {
+                return a.title.localeCompare(b.title);
+            });
             return winModel;
         })
         delete appModel['windows'];
         delete appModel['processDetails'];
+        appModel.children = appModel.children.sort((a, b) => {
+            return a.title.localeCompare(b.title);
+        });
         return appModel;
+    });
+    newTree = newTree.sort((a, b) => {
+        return a.title.localeCompare(b.title);
     });
     return { applications: newTree }
 }

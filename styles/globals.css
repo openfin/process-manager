@@ -33,6 +33,10 @@ menu li.rhs {
     margin-right: 10px;
 }
 
+pre {
+    font-size: 0.7rem;
+}
+
 .react-resizable {
     position: relative;
     background-clip: padding-box;
