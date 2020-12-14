@@ -4,6 +4,10 @@ html, body {
     font-family: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
+body {
+    overflow: hidden;
+}
+
 a {
     color: inherit;
     text-decoration: none;
@@ -54,4 +58,41 @@ pre {
 
 .firstcap {
     text-transform: capitalize;
+}
+
+p.error {
+    color: red;
+}
+
+#tabExtras {
+    display: flex;
+}
+
+#tabExtras .rvminfo {
+    margin-left: 10px;
+    padding-top: 4px;
+}
+
+.row_application {
+    background-color: #f7f7f7;
+}
+
+.row_window {
+    background-color: #eee;
+}
+
+.row_view {
+    background-color: #e7e7e7;
+}
+
+.ant-table-cell-fix-left, .ant-table-cell-fix-right {
+    background: inherit;
+}
+
+.ant-table-tbody > tr.ant-table-row:hover > td {
+    background: none;
+}
+
+thead[class*="ant-table-thead"] th {
+    background-color: #eee !important;
 }

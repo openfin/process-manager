@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getRVMInfo } from '../hooks/api';
 
-export const RVMInfo = () => {
+export const RVMInfo = ({className = 'rvminfo'}) => {
     const [rvmVersion, setRVMVersion] = useState('x.x.x')
 
     // load rvm version ensuring it runs only once
@@ -9,5 +9,5 @@ export const RVMInfo = () => {
         getRVMInfo().then(i => setRVMVersion(i.version))
     }, [])
 
-    return <div className="rhs">RVM v{rvmVersion}</div>
+    return <div className={className}>RVM v{rvmVersion}</div>
 }

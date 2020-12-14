@@ -1,12 +1,15 @@
 import * as React from 'react';
 import { Modal, Table, Button } from 'antd';
-import { getProcessTree, getItemInfo, ProcessModel, AppProcessModel, WinProcessModel, BaseProcessModel } from '../hooks/api';
+import { getProcessTree, getItemInfo, ProcessModel } from '../hooks/api';
 import { TableHeader } from './tableHeader';
 import { ProcessActions } from './processActions';
 import { PidLink } from './pidLink';
 
 interface ProcessTreeProps {
     pollForData: boolean;
+    headerHeight: number;
+    scrollX: number;
+    scrollY: number;
 }
 
 interface ProcessTreeState {
@@ -28,14 +31,6 @@ export class ProcessTree extends React.Component<ProcessTreeProps, ProcessTreeSt
         }
     }
     expandable = {
-        rowExpandable: (record:BaseProcessModel) => {
-            console.log('expand?', record);
-            if (record.identity.entityType!=='view') {
-                return false;
-            }
-            const thing: AppProcessModel|WinProcessModel = record as AppProcessModel|WinProcessModel;
-            return thing.children && thing.children.length > 0;
-        },
         onExpandedRowsChange: (expRows:string[]) => {
             console.log('expanding', expRows);
             this.setState({ expandedRows: expRows});
@@ -66,12 +61,14 @@ export class ProcessTree extends React.Component<ProcessTreeProps, ProcessTreeSt
                         return text;
                     },
                     width: 350,
+                    ellipsis: true,
                 },
                 {
                     title: 'URL',
                     dataIndex: 'url',
                     key: 'url',
                     width: 450,
+                    ellipsis: true,
                 },
                 {
                     title: 'Actions',
@@ -86,14 +83,24 @@ export class ProcessTree extends React.Component<ProcessTreeProps, ProcessTreeSt
             modalTitle: '',
             modalVisible: false,
             modalContents: '',
-            scrollX: 800,
-            scrollY: 500,
+            scrollX: props.scrollX,
+            scrollY: props.scrollY,
             expandedRows: [],
         };
     }
 
     componentDidMount() {
         this.startPolling();
+        this.setSize();
+        let resizeTimeout = 0;
+        window.addEventListener('resize', () => {
+            this.stopPolling();
+            clearTimeout(resizeTimeout);
+            resizeTimeout = window.setTimeout(()=> {
+                this.setSize();
+                this.startPolling();
+            }, 100);
+        });
     }
 
     componentWillUnmount() {
@@ -120,8 +127,9 @@ export class ProcessTree extends React.Component<ProcessTreeProps, ProcessTreeSt
                 scroll={{ x: (this.state as ProcessTreeState).scrollX, y: (this.state as ProcessTreeState).scrollY }}
                 size="small"
                 expandable={this.expandable}
+                rowClassName={(record, index) => this.getRowClass(record)}
             />
-            <Modal className="firstcap" title={(this.state as ProcessTreeState).modalTitle} visible={(this.state as ProcessTreeState).modalVisible} onCancel={this.hideModal.bind(this)} footer={[
+            <Modal className="firstcap" bodyStyle={{textTransform: 'none'}} title={(this.state as ProcessTreeState).modalTitle} visible={(this.state as ProcessTreeState).modalVisible} onCancel={this.hideModal.bind(this)} footer={[
                 <Button key="1" onClick={this.hideModal.bind(this)}>Close</Button>
                 ]}>
                 <pre>{(this.state as ProcessTreeState).modalContents}</pre>
@@ -168,4 +176,13 @@ export class ProcessTree extends React.Component<ProcessTreeProps, ProcessTreeSt
             return { columns: nextColumns };
         });
     };
+
+    setSize() {
+        let h = document.body.clientHeight - this.props.headerHeight;
+        this.setState({scrollY: h});
+    }
+
+    getRowClass(record) {
+        return `row_${record.identity.entityType}`
+    }
 }

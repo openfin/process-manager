@@ -52,10 +52,10 @@ export const toggleWindowVisibility = async (id:Identity, visible:boolean) => {
     return finAPI.toggleWindowVisibility(id, visible);
 }
 
+// full process tree model
 export interface ProcessModel {
     applications: AppProcessModel[];
 }
-
 export interface AppProcessModel extends BaseProcessModel {
     isRunning: boolean;
     isPlatform: boolean;
@@ -64,14 +64,11 @@ export interface AppProcessModel extends BaseProcessModel {
     icon?: string;
     children: WinProcessModel[];
 }
-
 export interface WinProcessModel extends BaseProcessModel {
     visible: boolean;
     children?: ViewProcessModel[];
 }
-
 export interface ViewProcessModel extends BaseProcessModel {}
-
 export interface BaseProcessModel {
     identity: Identity;
     title: string;
@@ -80,11 +77,11 @@ export interface BaseProcessModel {
     key: string;
     processInfo: ProcessInfo;
 }
-
 export interface ProcessInfo {
     pid: number;
 }
 
+// get a full process tree of all running applications
 export const getProcessTree = async ():Promise<ProcessModel> => {
     if (typeof fin === 'undefined') {
         return fauxAPI.getProcessTree();
@@ -93,11 +90,60 @@ export const getProcessTree = async ():Promise<ProcessModel> => {
     return transformPSTree(procs);
 }
 
+// get a list of entities for a single PID
 export const getPIDEntities = async (pid:number):Promise<EntityProcessDetails[]> => {
     if (typeof fin === 'undefined') {
         return fauxAPI.getPIDEntities(pid);
     }
     return finAPI.getPIDEntities(pid);
+}
+
+// close all applications - needs more testing to be used within platforms
+export const closeAllApplications = async () => {
+    if (typeof fin === 'undefined') {
+        return fauxAPI.closeAllApplications();
+    }
+    return finAPI.closeAllApplications();
+}
+
+// launch an application by manifest or site/app URL
+export const launchApplication = async ({manifestURL, applicationURL }) => {
+    if (typeof fin === 'undefined') {
+        return fauxAPI.launchApplication({manifestURL, applicationURL });
+    }
+    return finAPI.launchApplication({manifestURL, applicationURL });
+}
+
+// get the list of log files
+export const getLogs = async ():Promise<any[]> => {
+    if (typeof fin === 'undefined') {
+        return fauxAPI.getLogs();
+    }
+    return finAPI.getLogs();
+}
+
+// open a log file
+export const openLog = async (l):Promise<void> => {
+    if (typeof fin === 'undefined') {
+        return fauxAPI.openLog(l);
+    }
+    return finAPI.openLog(l);
+}
+
+// copy the path of a log file
+export const copyLogPath = async (l):Promise<string> => {
+    if (typeof fin === 'undefined') {
+        return fauxAPI.copyLogPath(l);
+    }
+    return finAPI.copyLogPath(l);
+}
+
+// get our current UUID
+export const getCurrentUUID = () => {
+    if (typeof fin === 'undefined') {
+        return fauxAPI.getCurrentUUID();
+    }
+    return finAPI.getCurrentUUID();
 }
 
 // map between internal and exported interfaces
@@ -115,29 +161,30 @@ const transformPSTree = async (procTree:finAPI.appProcessTree[]):Promise<Process
         appModel.children = a.windows.map( w => {
             pid = w.processDetails ? w.processDetails.pid : 0;
             const winModel:WinProcessModel  = Object.assign({}, w, { 
-                children: [], 
                 key: `${a.identity.uuid}_${w.identity.name}`,
                 processInfo: {
                     pid: pid,
                 },
             });
             let k = 0;
-            winModel.children = w.views.map( v => {
-                pid = v.processDetails ? v.processDetails.pid : 0;
-                const viewModel:ViewProcessModel  = Object.assign({}, v, { 
-                    key: `${a.identity.uuid}_${w.identity.name}_${v.identity.uuid}`, 
-                    processInfo: {
-                        pid: pid,
-                    },
+            if (w.views && w.views.length > 0) {
+                const winViews = w.views.map( v => {
+                    pid = v.processDetails ? v.processDetails.pid : 0;
+                    const viewModel:ViewProcessModel  = Object.assign({}, v, { 
+                        key: `${a.identity.uuid}_${w.identity.name}_${v.identity.uuid}`, 
+                        processInfo: {
+                            pid: pid,
+                        },
+                    });
+                    delete viewModel['processDetails'];
+                    return viewModel;
+                })
+                winModel.children = winViews.sort((a, b) => {
+                    return a.title.localeCompare(b.title);
                 });
-                delete viewModel['processDetails'];
-                return viewModel;
-            })
+            }
             delete winModel['views'];
             delete winModel['processDetails'];
-            winModel.children = winModel.children.sort((a, b) => {
-                return a.title.localeCompare(b.title);
-            });
             return winModel;
         })
         delete appModel['windows'];
@@ -148,7 +195,11 @@ const transformPSTree = async (procTree:finAPI.appProcessTree[]):Promise<Process
         return appModel;
     });
     newTree = newTree.sort((a, b) => {
-        return a.title.localeCompare(b.title);
+        if ( a.title && b.title ) {
+            return a.title.localeCompare(b.title);
+        } else {
+            return a.identity.uuid.localeCompare(b.identity.uuid)
+        }
     });
     return { applications: newTree }
 }

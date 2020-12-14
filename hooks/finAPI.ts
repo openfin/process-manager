@@ -1,6 +1,7 @@
 import { Identity } from "openfin-adapter";
 import { _Window } from "openfin-adapter/src/api/window";
 import { AppProcessInfo, EntityProcessDetails } from 'openfin-adapter/src/shapes/process_info'
+import { formatBytes, defaultAppOptions, url2AppName, url2AppUUID } from './utils'
 
 const MIN_API_VER = 55;
 
@@ -169,4 +170,63 @@ export const getProcessTree = async():Promise<appProcessTree[]> => {
 
 export const getPIDEntities = async (pid: number):Promise<EntityProcessDetails[]> => {
     return [];
+}
+
+export const closeAllApplications = async () => {
+    const myUUID = getCurrentUUID();
+    const procs = await fin.System.getProcessList();
+    return Promise.all(procs.map( async p => {
+        if (p.uuid !== myUUID) {
+            const app = await fin.Application.wrap({ uuid: p.uuid});
+            app.quit(true);
+        }
+    }))
+}
+
+export const launchApplication = async ({manifestURL, applicationURL }) => {
+    if ( manifestURL !== '' ) {
+        return fin.Application.startFromManifest(manifestURL);
+    } else if ( applicationURL !== '' ) {
+        const appUUID = url2AppUUID(applicationURL);
+        const opts = Object.assign({}, defaultAppOptions, {
+            name: url2AppName(applicationURL), 
+            uuid: appUUID, url: applicationURL, 
+            mainWindowOptions: {
+                 name: appUUID,
+            },
+        });
+        return fin.Application.start(opts);
+    } else {
+        throw new Error('invalid arguments, must supply manifest or application url')
+    }
+}
+
+export const getCurrentUUID = () => {
+    return fin.Application.getCurrentSync().identity.uuid
+}
+
+export const getLogs = async ():Promise<any[]> => {
+    const logs = await fin.System.getLogList();
+    const dateOpts = {year: 'numeric', month: '2-digit', day: '2-digit'};
+    const timeOpts = {hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'};
+    return logs.map(l => {
+        const logDate = new Date(Date.parse(l.date || ''));
+        const logSize = l.size || 0;
+        const newInfo = {
+            fileName: l.name || '',
+            size: logSize,
+            formattedSize: formatBytes(logSize, 1),
+            date: logDate,
+            formattedDate: logDate.toLocaleDateString('en-US', dateOpts) + ' ' + logDate.toLocaleTimeString('en-US', timeOpts)
+        };
+        return newInfo;        
+    });
+}
+
+export const openLog = async (l):Promise<void> => {
+    return fin.System.openUrlWithBrowser(l.fileName);
+}
+
+export const copyLogPath = async (l):Promise<void> => {
+    navigator.clipboard.writeText(l.fileName)
 }

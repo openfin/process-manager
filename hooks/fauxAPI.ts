@@ -1,5 +1,4 @@
 import { Identity } from "openfin-adapter";
-import { EntityProcessDetails } from 'openfin-adapter/src/shapes/process_info'
 
 import { ProcessModel } from "./api";
 
@@ -173,4 +172,29 @@ export const getPIDEntities = async (pid: number):Promise<any[]> => {
             mem: 9267345
         }
     ];
+}
+
+export const closeAllApplications = async () => {
+    console.log('noop closeAllApplications');
+}
+
+export const launchApplication = async ({manifestURL, applicationURL }) => {
+    console.log('noop closeAllApplications', manifestURL, applicationURL);
+}
+
+export const getLogs = async ():Promise<any[]> => {
+    return [];
+}
+
+export const getCurrentUUID = () => {
+    return 'process-manager'
+}
+
+export const openLog = async (l):Promise<void> => {
+    console.log('noop openLog', l);
+}
+
+export const copyLogPath = async (l):Promise<void> => {
+    console.log('noop copyLogPath', l);
+    navigator.clipboard.writeText('fake log path')
 }
