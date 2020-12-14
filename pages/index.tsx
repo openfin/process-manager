@@ -4,6 +4,7 @@ import { Tabs, Menu, Dropdown, Button, Modal, Form, Input } from 'antd';
 import { RocketOutlined, DeleteOutlined, SettingOutlined, InfoCircleOutlined} from '@ant-design/icons';
 import { RVMInfo } from '../components/rvmInfo'
 import { ProcessTree } from '../components/processTree'
+import { Workspace } from '../components/workspace'
 import { LogList } from '../components/logList'
 import { launchApplication, closeAllApplications } from '../hooks/api';
 
@@ -96,7 +97,7 @@ export default function Home() {
                         <ProcessTree headerHeight={115} scrollX={800} scrollY={600} pollForData={selectedTab === "1"} />
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="Screens" key="2">
-                        COLORED BLOCKS
+                        <Workspace brightness={150} labelHeight={28} height={800} width={600} pollForData={selectedTab === "2"} />
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="Logs" key="3">
                         <LogList pollForData={selectedTab === "3"} />

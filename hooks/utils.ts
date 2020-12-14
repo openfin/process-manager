@@ -38,3 +38,23 @@ export const url2AppName = (name: string) => {
 export const url2AppUUID = (name: string) => {
     return name.replace(/https?:\/\//, '').replace(/\//g, '-').replace('.', '-');
 }
+
+const colorCache:{[key:string]:string} = {};
+export const getRandomFillColor = (uuid: string, name: string, brightness: number) => {
+    const key = uuid + '__' + name;
+    const color = colorCache[key];
+    if (color) {
+        return color;
+    } else {
+        const color = '#' + randomColorChannel(brightness) + randomColorChannel(brightness) + randomColorChannel(brightness);
+        colorCache[key] = color;
+        return color;
+    }
+}
+
+export const randomColorChannel = (brightness:number) => {
+    const r = 255-brightness;
+    const n = 0|((Math.random() * r) + brightness);
+    const s = n.toString(16);
+    return (s.length === 1) ? '0'+s : s;
+}
