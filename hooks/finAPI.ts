@@ -1,7 +1,11 @@
 import { Identity } from "openfin-adapter";
 import { _Window } from "openfin-adapter/src/api/window";
+import { WindowDetail } from 'openfin-adapter/src/api/system/window';
+import { MonitorInfo } from 'openfin-adapter/src/api/system/monitor';
 import { AppProcessInfo, EntityProcessDetails } from 'openfin-adapter/src/shapes/process_info'
-import { formatBytes, defaultAppOptions, url2AppName, url2AppUUID } from './utils'
+import { formatBytes, defaultAppOptions, url2AppName, url2AppUUID, getRandomFillColor } from './utils'
+
+import { WindowInfo, WorkspaceInfo, Monitor } from './api'
 
 const MIN_API_VER = 55;
 
@@ -230,3 +234,57 @@ export const openLog = async (l):Promise<void> => {
 export const copyLogPath = async (l):Promise<void> => {
     navigator.clipboard.writeText(l.fileName)
 }
+
+export const getWorkspaceItems = async (brightness:number) => {
+    const winList:WindowDetail[] = [];
+    const list = await fin.System.getAllWindows();
+    const allWins = list.map(w => [w.mainWindow!].concat(w.childWindows!).map(cw => 
+        Object.assign(cw, {
+            uuid: w.uuid!,
+            parentName: '',
+            parentUUID: '',
+            color: getRandomFillColor(w.uuid!, cw.name!, brightness),
+            area: 0,
+            showing: false
+        }))
+    ).reduce( (p,c) => p.concat(c), []);
+    for (const w of allWins) {
+        const fInfo = await fin.Frame.wrapSync({uuid: w.uuid!, name: w.name!}).getInfo()
+        w.parentName = fInfo.parent.name||'';
+        w.parentUUID = fInfo.parent.uuid;
+        const ofWin = await fin.Window.wrap(w);
+        const info = await ofWin.getInfo();
+        w.showing = await ofWin.isShowing();
+        w.area = calcWindowArea(w);
+        winList.push(w);
+    }
+    return winList;
+}
+
+const calcWindowArea = (win:WindowInfo) => {
+    return (win.right! - win.left!)*(win.bottom! - win.top!);
+}
+
+export const getWorkspaceInfo = async (): Promise<WorkspaceInfo> => {
+    const monInfo = await fin.System.getMonitorInfo();
+    const mons = getAllMonitors(monInfo);
+    return {
+        virtualTop: monInfo.virtualScreen.top,
+        virtualLeft: monInfo.virtualScreen.left,
+        virtualHeight: monInfo.virtualScreen.bottom - monInfo.virtualScreen.top, 
+        virtualWidth: monInfo.virtualScreen.right - monInfo.virtualScreen.left,
+        monitors: mons
+    };
+}
+
+const getAllMonitors = (mons: MonitorInfo): Monitor[] => {
+    const infos:Monitor[] = [];
+    const pInfo = mons.primaryMonitor.monitorRect;
+    infos[0] = { "top": pInfo.top, left: pInfo.left, bottom: pInfo.bottom, right: pInfo.right, name: 'Main Monitor'};
+    for (let i=0; i<mons.nonPrimaryMonitors.length; i++) {
+        const nonPInfo = mons.nonPrimaryMonitors[i].monitorRect;
+        infos[infos.length] = { "top": nonPInfo.top, left: nonPInfo.left, bottom: nonPInfo.bottom, right: nonPInfo.right, name: `Monitor ${i+1}`};
+    }
+    return infos;
+}
+

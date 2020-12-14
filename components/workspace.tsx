@@ -114,7 +114,6 @@ export const Workspace = ({ pollForData, height, width, labelHeight, brightness 
             calcSize();
             const w = await getWorkspaceItems(brightness);
             setItems(w);
-            console.log('polling items', items);
             renderCanvas();
         }
     }

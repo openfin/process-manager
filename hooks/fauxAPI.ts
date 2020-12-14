@@ -1,6 +1,6 @@
 import { Identity } from "openfin-adapter";
 
-import { ProcessModel } from "./api";
+import { ProcessModel, WorkspaceInfo } from "./api";
 
 export const rvmInfo = async () => {
     return { version: '0.0.0' }
@@ -183,7 +183,14 @@ export const launchApplication = async ({manifestURL, applicationURL }) => {
 }
 
 export const getLogs = async ():Promise<any[]> => {
-    return [];
+    return [
+        {
+            fileName: "debug.log",
+            formattedDate: "12/14/2020 15:18:05",
+            formattedSize: "7.4KB",
+            size: 7620
+        }
+    ];
 }
 
 export const getCurrentUUID = () => {
@@ -197,4 +204,44 @@ export const openLog = async (l):Promise<void> => {
 export const copyLogPath = async (l):Promise<void> => {
     console.log('noop copyLogPath', l);
     navigator.clipboard.writeText('fake log path')
+}
+
+export const getWorkspaceItems = async (brightness:number) => {
+    return [
+        {
+            area: 851040,
+            bottom: 816,
+            color: "#b5acd6",
+            height: 720,
+            isShowing: true,
+            left: 165,
+            name: "process-manager",
+            parentName: "",
+            parentUUID: "",
+            right: 1347,
+            showing: true,
+            state: "normal",
+            top: 96,
+            uuid: "process-manager",
+            width: 1182
+        }
+    ];
+}
+
+export const getWorkspaceInfo = async (): Promise<WorkspaceInfo> => {
+    return {
+        virtualLeft: 0,
+        virtualTop: 0,
+        virtualWidth: 1440,
+        virtualHeight: 900,
+        monitors: [
+            {
+                bottom: 900,
+                left: 0,
+                right: 1440,
+                top: 0,
+                name: "Main Monitor"
+            }
+        ]
+    }
 }
