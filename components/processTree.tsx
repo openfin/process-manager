@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Modal, Table, Button } from 'antd';
-import { getProcessTree, getItemInfo, ProcessModel } from '../hooks/api';
+import getAPI, { EntityType, ProcessModel } from '../hooks/api';
 import { TableHeader } from './tableHeader';
 import { ProcessActions } from './processActions';
-import { PidLink } from './pidLink';
+import { AppLink } from './appLink';
 
 interface ProcessTreeProps {
     pollForData: boolean;
@@ -25,6 +25,7 @@ interface ProcessTreeState {
 
 export class ProcessTree extends React.Component<ProcessTreeProps, ProcessTreeState> {
     timer = 0;
+    resizing = false;
     components = {
         header: {
             cell: TableHeader
@@ -42,26 +43,18 @@ export class ProcessTree extends React.Component<ProcessTreeProps, ProcessTreeSt
         this.state = {
             columns: [
                 {
-                    title: 'PID',
-                    dataIndex: 'pid',
-                    key: 'pid',
-                    width: 150,
-                    render: (text, record) => <PidLink pid={record.processInfo.pid} />,
-                    fixed: 'left',
-                    resizable: false,
-                },
-                {
                     title: 'Name',
                     dataIndex: 'title',
                     key: 'name',
                     render: (text, record) => {
-                        if (record.identity.entityType === 'window') {
-                            return `${text} (${record.identity.name})`
+                        if (record.entityType === EntityType.Application) {
+                            return <AppLink uuid={record.identity.uuid} text={record.identity.uuid} />
                         }
-                        return text;
+                        return record.identity.name || record.identity.uuid
                     },
-                    width: 350,
+                    width: 250,
                     ellipsis: true,
+                    fixed: 'left',
                 },
                 {
                     title: 'URL',
@@ -94,11 +87,11 @@ export class ProcessTree extends React.Component<ProcessTreeProps, ProcessTreeSt
         this.setSize();
         let resizeTimeout = 0;
         window.addEventListener('resize', () => {
-            this.stopPolling();
+            this.resizing = true;
             clearTimeout(resizeTimeout);
             resizeTimeout = window.setTimeout(()=> {
                 this.setSize();
-                this.startPolling();
+                this.resizing = false;
             }, 100);
         });
     }
@@ -147,15 +140,15 @@ export class ProcessTree extends React.Component<ProcessTreeProps, ProcessTreeSt
     }
 
     private async pollForApps() {
-        if (this.props.pollForData) {
-            const procModel = await getProcessTree();
+        if (this.props.pollForData && !this.resizing) {
+            const procModel = await getAPI().getProcessTree();
             this.setState({ tree: procModel });
         }
     }
 
     async showInfo(item: any) {
-        const info = await getItemInfo(item.identity);
-        this.showModal(`${item.identity.entityType} Info`, JSON.stringify(info, null, 4));
+        const info = await getAPI().getItemInfo(item.identity, item.entityType);
+        this.showModal(`${item.entityType} Info`, JSON.stringify(info, null, 4));
     }
 
     showModal(title: string, contents: string) {

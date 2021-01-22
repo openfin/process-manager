@@ -2,22 +2,21 @@ import { useState, useEffect } from 'react';
 import { Space, Button } from 'antd';
 import { CodeOutlined, MedicineBoxOutlined, InfoCircleOutlined, CloseCircleOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { blue } from '@ant-design/colors';
-import { showDeveloperTools, closeItem, rescueWindow, toggleWindowVisibility, getCurrentUUID } from '../hooks/api';
+import getAPI from '../hooks/api';
 
 export const ProcessActions = ({ item, infoHandler }) => {
     const [uuid, setUUID] = useState('x.x.x')
 
     // get our UUID ensuring it runs only once
     useEffect(() => {
-        const uuid = getCurrentUUID();
-        setUUID(uuid);
+        getAPI().getCurrentUUID().then(uuid => setUUID(uuid));
     }, [])
 
     const size = 'small';
     const buttonType = 'primary';
 
     const showDevTools = () => {
-        showDeveloperTools(item.identity);
+        getAPI().showDeveloperTools(item.identity, item.entityType);
     }
 
     const showInfo = async () => {
@@ -25,15 +24,15 @@ export const ProcessActions = ({ item, infoHandler }) => {
     }
 
     const rescueWin = () => {
-        rescueWindow(item.identity);
+        getAPI().rescueWindow(item.identity);
     }
 
     const close = () => {
-        closeItem(item.identity);
+        getAPI().closeItem(item.identity, item.entityType);
     }
 
     const toggleWindowVis = () => {
-        toggleWindowVisibility(item.identity, item.visible);
+        getAPI().toggleWindowVisibility(item.identity, item.visible);
     }
 
     const isButtonDisabled = () => {
@@ -42,7 +41,7 @@ export const ProcessActions = ({ item, infoHandler }) => {
 
     const getButtonStyle = () => {
         let buttonColor;
-        switch(item.identity.entityType) {
+        switch(item.entityType) {
             case 'view':
                 buttonColor = blue[3]
                 break;
@@ -57,7 +56,7 @@ export const ProcessActions = ({ item, infoHandler }) => {
     }
 
     let winButtons = [];
-    if (item.identity.entityType === 'window') {
+    if (item.entityType === 'window') {
         winButtons = [
             <Button key={2} title={item.visible ? 'hide window' : 'show window'} type="primary" style={getButtonStyle()} size={size} 
                 onClick={toggleWindowVis} 
@@ -69,9 +68,9 @@ export const ProcessActions = ({ item, infoHandler }) => {
 
     return <Space size={size}>
         <Button title="launch dev tools" type="primary" style={getButtonStyle()} size={size} onClick={showDevTools} icon={<CodeOutlined />}></Button>
-        <Button title={`show ${item.identity.entityType} info`} type="primary" style={getButtonStyle()} size={size} onClick={showInfo} 
+        <Button title={`show ${item.entityType} info`} type="primary" style={getButtonStyle()} size={size} onClick={showInfo} 
             icon={<InfoCircleOutlined />}></Button>
-        <Button title={`close ${item.identity.entityType}`} type="primary" style={getButtonStyle()} size={size} onClick={close} 
+        <Button title={`close ${item.entityType}`} type="primary" style={getButtonStyle()} size={size} onClick={close} 
             icon={<CloseCircleOutlined />} 
             disabled={isButtonDisabled()}></Button>
         {winButtons}

@@ -1,4 +1,9 @@
 // next.config.js
+const path = require('path')
+
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+const host = process.env.HOST || 'http://localhost:3000';
 
 module.exports = {
     async rewrites() {
@@ -11,5 +16,24 @@ module.exports = {
     },
     experimental: {
         productionBrowserSourceMaps: true
-    }
+    },
+    webpack: (config, { isServer, webpack }) => {
+        // copy app.json and replace ROOT_URL
+        if (!isServer) {
+            config.plugins.push(new CopyWebpackPlugin(
+                [
+                    {
+                        from: path.join(__dirname, 'app.json'), 
+                        to: path.join(__dirname, 'public', 'app.json'), 
+                        transform: (contents) => {
+                            let manif = contents.toString().replace(/ROOT_URL/g, host);
+                            return manif;
+                        }
+                    }
+                ]
+            ))    
+        }
+        // Important: return the modified config
+        return config
+    },
 }

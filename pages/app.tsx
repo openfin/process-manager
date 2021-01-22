@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { PageHeader } from '../components/pageHeader'
 import { ViewHeader } from '../components/viewHeader'
-import { PIDView } from '../components/pidView'
+import { AppView } from '../components/appView'
 
 export default function PID() {
-    const [pid, setPID] = useState('');
+    const [uuid, setUUID] = useState('');
     const [autoRefresh, setAutoRefresh] = useState(true)
 
     const onRefreshToggle = (v: boolean) => {
@@ -13,16 +13,16 @@ export default function PID() {
 
     // load pid value from URL ensuring it runs only once
     useEffect(() => {
-        const pid = new URL(window.location.href).searchParams.get('pid')
-        setPID(pid);
+        const id = new URL(window.location.href).searchParams.get('uuid')
+        setUUID(id);
     }, []);
 
     return (
         <div>
-            <PageHeader title={`Process Manager - PID: ${pid}`} />
+            <PageHeader title={`Process Manager - App: ${uuid}`} />
             <main>
                 <ViewHeader checked={autoRefresh} onChange={onRefreshToggle}></ViewHeader>
-                <PIDView pollForData={autoRefresh} pid={pid} />
+                <AppView pollForData={autoRefresh} uuid={uuid} />
             </main>
         </div>
     )

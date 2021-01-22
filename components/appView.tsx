@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { getPIDEntities } from '../hooks/api';
+import getAPI from '../hooks/api';
 import { Table } from 'antd';
 
-export const PIDView = ({ pid, pollForData }) => {
+export const AppView = ({ uuid, pollForData }) => {
     let timer = 0;
     const [data, setData] = useState([]);
     const columns = [
@@ -37,16 +37,16 @@ export const PIDView = ({ pid, pollForData }) => {
         },
     ];
 
-    const pollPID = async () => {
+    const pollProcs = async () => {
         if (pollForData) {
-            console.log('polling for PID: ' + pid)
-            const procList = await getPIDEntities(pid);
+            console.log('polling for app processes: ' + uuid)
+            const procList = await getAPI().getAppProcesses(uuid);
             setData(procList);
         }
     }
 
     const startPolling = () => {
-        timer = window.setInterval(() => pollPID(), 1000);
+        timer = window.setInterval(() => pollProcs(), 1000);
     }
 
     const stopPolling = () => {

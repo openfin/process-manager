@@ -6,7 +6,7 @@ import { RVMInfo } from '../components/rvmInfo'
 import { ProcessTree } from '../components/processTree'
 import { Workspace } from '../components/workspace'
 import { LogList } from '../components/logList'
-import { launchApplication, closeAllApplications } from '../hooks/api';
+import getAPI from '../hooks/api';
 
 export default function Home() {
     const defaultTab = "1";
@@ -50,7 +50,7 @@ export default function Home() {
             title: 'Close ALL Applications?',
             content: 'Click OK to close ALL running applications.',
             onOk() {
-                closeAllApplications();
+                getAPI().closeAllApplications();
             },
             onCancel() {},
         });
@@ -61,7 +61,7 @@ export default function Home() {
         const siteURL = (document.getElementById('appSiteUrl') as HTMLInputElement).value;
         if (manifURL !== '' || siteURL !== '') {
             try {
-                await launchApplication({ manifestURL: manifURL, applicationURL: siteURL})
+                await getAPI().launchApplication({ manifestURL: manifURL, applicationURL: siteURL})
                 closeAppModal();
             } catch(e) {
                 setErrorMSG(e.message)
@@ -75,7 +75,7 @@ export default function Home() {
         <div>
             <PageHeader title="Process Manager" />
             <main>
-                <Tabs tabBarExtraContent={
+                <Tabs activeKey={selectedTab} tabBarExtraContent={
                         <div id="tabExtras">
                             {selectedTab === "1" ?
                             <Dropdown overlay={

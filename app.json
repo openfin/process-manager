@@ -6,7 +6,7 @@
     "logging": true,
     "startup_app": {
         "name": "process-manager",
-        "version": "1.7.3",
+        "version": "2.0.0",
         "description": "Process Manager",
         "url": "ROOT_URL/index.html",
         "uuid": "process-manager",

@@ -1,65 +1,58 @@
-import { Identity } from "openfin-adapter";
-import { _Window } from "openfin-adapter/src/api/window";
-import { WindowDetail } from 'openfin-adapter/src/api/system/window';
-import { MonitorInfo } from 'openfin-adapter/src/api/system/monitor';
-import { AppProcessInfo, EntityProcessDetails } from 'openfin-adapter/src/shapes/process_info'
 import { formatBytes, defaultAppOptions, url2AppName, url2AppUUID, getRandomFillColor } from './utils'
+import { EntityType, AppProcessModel, WinProcessModel, ViewProcessModel, WorkspaceItem } from './api'
 
 import { WindowInfo, WorkspaceInfo, Monitor } from './api'
 
 const MIN_API_VER = 55;
 
-export const rvmInfo = async () => {
-    return fin.System.getRvmInfo();
-}
-
-export const showDeveloperTools = async (id:Identity) => {
-    return fin.System.showDeveloperTools(id);
-}
-
-export const closeItem = async (id:Identity) => {
-    if (id.entityType === 'view') {
-        // const v = await fin.View.wrap({uuid: id.uuid, name: id.name});
-        // v.close();
-    } else if (id.entityType === 'window') {
-        const w = await fin.Window.wrap({uuid: id.uuid, name: id.name});
-        w.close();
-    } else {
-        const app = await fin.Application.wrap(id);
-        app.close();
-    }
-}
-
-export const getItemInfo = async (id:Identity) => {
-    if (id.entityType === 'view') {
-        const v = await fin.View.wrap({uuid: id.uuid, name: id.name});
-        const info = await v.getInfo();
-        const opts = await v.getOptions();
-        return { info, options: opts };
-    } else if (id.entityType === 'window') {
-        const win = await fin.Window.wrap({uuid: id.uuid, name: id.name});
-        const info = await win.getInfo();
-        const opts = await win.getOptions();
-        return { info, options: opts };
-    } else {
-        const app = await fin.Application.wrap(id);
-        const appInfo = await app.getInfo();
-        delete appInfo.manifestUrl;
-        return appInfo;
-    }
-}
-
-export const rescueWindow = async (id:Identity) => {
-    if (id.entityType === 'window') {
+export default {
+    getCurrentUUID: async() =>{
+        return getUUID();
+    },
+    getRVMVersion: async () => {
+        const rvmInfo = await fin.System.getRvmInfo();
+        return rvmInfo.version;
+    },
+    showDeveloperTools: async (id:OpenFin.Identity, entityType: EntityType) => {
+        return fin.System.showDeveloperTools(id);
+    },
+    closeItem: async (id:OpenFin.Identity, entityType: EntityType) => {
+        if (entityType === EntityType.View) {
+            // const v = await fin.View.wrap({uuid: id.uuid, name: id.name});
+            // v.close();
+        } else if (entityType === EntityType.Window) {
+            const w = await fin.Window.wrap({uuid: id.uuid, name: id.name});
+            w.close();
+        } else {
+            const app = await fin.Application.wrap(id);
+            app.quit();
+        }
+    },
+    getItemInfo: async (id:OpenFin.Identity, entityType: EntityType) => {
+        if (entityType === EntityType.View) {
+            const v = await fin.View.wrap({uuid: id.uuid, name: id.name});
+            const info = await v.getInfo();
+            const opts = await v.getOptions();
+            return { info, options: opts };
+        } else if (entityType === EntityType.Window) {
+            const win = await fin.Window.wrap({uuid: id.uuid, name: id.name});
+            const info = await win.getInfo();
+            const opts = await win.getOptions();
+            return { info, options: opts };
+        } else {
+            const app = await fin.Application.wrap(id);
+            const appInfo = await app.getInfo();
+            delete appInfo.manifestUrl;
+            return appInfo;
+        }
+    },
+    rescueWindow: async (id:OpenFin.Identity) => {
         const ofwin = await fin.Window.wrap({ uuid: id.uuid, name: id.name});
         ofwin.moveTo(100, 100);
         ofwin.focus();
         ofwin.bringToFront();    
-    }
-}
-
-export const toggleWindowVisibility = async (id:Identity, visible:boolean) => {
-    if (id.entityType === 'window') {
+    },
+    toggleWindowVisibility: async (id:OpenFin.Identity, visible:boolean) => {
         if (visible) {
             const ofwin = await fin.Window.wrap({ uuid: id.uuid, name: id.name});
             ofwin.hide();
@@ -69,215 +62,213 @@ export const toggleWindowVisibility = async (id:Identity, visible:boolean) => {
             ofwin.focus();
             ofwin.bringToFront();
         }    
+    },
+    getProcessTree: async() => {
+        const allApps = await fin.System.getAllApplications();
+        let appsModel = await Promise.all(allApps.map(async (a) => {
+            const app = await fin.Application.wrap({uuid: a.uuid});
+            const info = await app.getInfo();
+            const runtimeVersion = info.runtime["version"];
+            const apiVersion = parseInt(runtimeVersion.split('.')[2]);
+            const wins = await getAppWindows(app);
+            const an:AppProcessModel = {
+                identity: {...app.identity, name: app.identity.uuid },
+                entityType: EntityType.Application,
+                url: info.manifestUrl,
+                title: app.identity.uuid,
+                key: app.identity.uuid,
+                runtimeVersion,
+                isPlatform: info.initialOptions["isPlatformController"],
+                isRunning: a.isRunning,
+                isLegacy: apiVersion < MIN_API_VER,
+                icon: info.initialOptions["applicationIcon"],
+                children: wins,
+            };
+            return an;
+        }));
+        appsModel = appsModel.sort(titleUUIDSorter)
+        return {
+            applications: appsModel
+        }
+    },
+    getAppProcesses: async (uuid: string):Promise<any[]> => {
+        return [];
+    },
+    closeAllApplications: async () => {
+        const myUUID = getUUID();
+        const procInfo = await fin.System.getAllProcessInfo();
+        await Promise.all(procInfo.apps.map( async p => {
+            if (p.uuid !== myUUID) {
+                const app = await fin.Application.wrap({ uuid: p.uuid});
+                app.quit(true);
+            }
+        }))
+    },
+    launchApplication: async ({manifestURL, applicationURL }) => {
+        if ( manifestURL !== '' ) {
+            fin.Application.startFromManifest(manifestURL);
+        } else if ( applicationURL !== '' ) {
+            const appUUID = url2AppUUID(applicationURL);
+            const opts = Object.assign({}, defaultAppOptions, {
+                name: url2AppName(applicationURL), 
+                uuid: appUUID, url: applicationURL, 
+                mainWindowOptions: {
+                     name: appUUID,
+                },
+            });
+            fin.Application.start(opts);
+        } else {
+            throw new Error('invalid arguments, must supply manifest or application url')
+        }
+    },
+    getLogs: async ():Promise<any[]> => {
+        const logs = await fin.System.getLogList();
+        const dateOpts = {year: 'numeric', month: '2-digit', day: '2-digit'};
+        const timeOpts = {hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'};
+        return logs.map((l, i) => {
+            const logDate = new Date(Date.parse(l.date || ''));
+            const logSize = l.size || 0;
+            const newInfo = {
+                key: `log_${i}`,
+                fileName: l.name || '',
+                size: logSize,
+                formattedSize: formatBytes(logSize, 1),
+                date: logDate,
+                formattedDate: logDate.toLocaleDateString('en-US', dateOpts) + ' ' + logDate.toLocaleTimeString('en-US', timeOpts)
+            };
+            return newInfo;        
+        });
+    },
+    copyLogPath: (l) => {
+        navigator.clipboard.writeText(l.fileName)
+    },
+    getWorkspaceItems: async (brightness:number):Promise<WorkspaceItem[]> => {
+        const winList:WorkspaceItem[] = [];
+        const list = await fin.System.getAllWindows();
+        const allWins = list.map(w => [w.mainWindow!].concat(w.childWindows!).map(cw => 
+            Object.assign(cw, {
+                uuid: w.uuid!,
+                parentName: '',
+                parentUUID: '',
+                color: getRandomFillColor(w.uuid!, cw.name!, brightness),
+                area: 0,
+                showing: false
+            }))
+        ).reduce( (p,c) => p.concat(c), []);
+        for (const w of allWins) {
+            const fInfo = await fin.Frame.wrapSync({uuid: w.uuid!, name: w.name!}).getInfo()
+            w.parentName = fInfo.parent.name||'';
+            w.parentUUID = fInfo.parent.uuid;
+            const ofWin = await fin.Window.wrap(w);
+            const info = await ofWin.getInfo();
+            w.showing = await ofWin.isShowing();
+            w.area = calcWindowArea(w);
+            winList.push(w);
+        }
+        return winList;
+    },
+    getWorkspaceInfo: async (): Promise<WorkspaceInfo> => {
+        const monInfo = await fin.System.getMonitorInfo();
+        const mons = getAllMonitors(monInfo);
+        return {
+            virtualTop: monInfo.virtualScreen.top,
+            virtualLeft: monInfo.virtualScreen.left,
+            virtualHeight: monInfo.virtualScreen.bottom - monInfo.virtualScreen.top, 
+            virtualWidth: monInfo.virtualScreen.right - monInfo.virtualScreen.left,
+            monitors: mons
+        };
     }
 }
 
-export interface appProcessTree extends processTree {
+export interface appNode extends processNode {
     description?: string;
     company?: string
     isPlatform: boolean;
     isRunning: boolean;
+    isLegacy: boolean;
     icon: string;
     runtimeVersion: string;
-    windows: winProcessTree[];
+    windows: winNode[];
 }
 
-export interface winProcessTree extends processTree {
+export interface winNode extends processNode {
     visible: boolean;
-    views: viewProcessTree[];
+    views: viewNode[];
 }
 
-export interface viewProcessTree extends processTree {
+export interface viewNode extends processNode {
     visible: boolean;
 }
 
-interface processTree {
-    identity: Identity;
+interface processNode {
+    identity: OpenFin.Identity;
+    entityType: EntityType;
     title: string;
     url: string;
-    processDetails: EntityProcessDetails;
 }
 
-export const getProcessTree = async():Promise<appProcessTree[]> => {
-
-    async function getWindowPSList (winList:_Window[], psInfo:AppProcessInfo): Promise<winProcessTree[]> {
-        return await Promise.all(winList.map(async (w) => {
-            const ps = psInfo.entities.find(i => i.name === w.identity.name);
-            const views = await getViewList(w, psInfo);
-            const winfo = await w.getInfo();
-            const isShowing = await w.isShowing();
-            return Object.assign(w, { 
-                identity: {...w.identity, entityType: 'window' },
-                title: winfo.title,
-                url: winfo.url,
-                processDetails: ps, 
-                visible: isShowing, 
-                views: views,
-            });
-        }));
-    }
-
-    async function getViewList (win:_Window, psInfo:AppProcessInfo): Promise<viewProcessTree[]> {
-        const views = await win.getCurrentViews();
-        return await Promise.all(views.map(async(v) => {
-            const ps = psInfo.entities.find(i => i.name === v.identity.name);
-            const info = await v.getInfo();
-            return Object.assign(v, {
-                identity: {...v.identity, entityType: 'view' },
-                title: info.title,
-                url: info.url,
-                processDetails: ps,
-                visible: true,
-            });
-        }));
-    };
-
-    return await Promise.all((await fin.System.getAllApplications()).map(async (a) => {
-        const app = fin.Application.wrapSync(a);
-        const info = await app.getInfo();
-        const running = await app.isRunning();
-        const winList = await app.getChildWindows();
-        const mainWin = await app.getWindow();
-        winList.push(mainWin);
-        const runtimeVersion = info.runtime["version"];
-        const apiVersion = parseInt(runtimeVersion.split('.')[2]);
-        
-        let psInfo: AppProcessInfo = { uuid: '', entities: []}, mainWinPSDetails:EntityProcessDetails = null;
-        if (apiVersion >= MIN_API_VER) {
-            psInfo = await app.getProcessInfo();
-            mainWinPSDetails = psInfo.entities.find(epd => epd.name === mainWin.identity.name)
-        }
-
-        const applicationProcessInfo: appProcessTree = {
-            identity: {...app.identity, entityType: 'application'},
-            url: info.manifestUrl,
-            title: app.identity.uuid,
-            runtimeVersion,
-            isPlatform: info.initialOptions["isPlatformController"],
-            isRunning: running,
-            icon: info.initialOptions["applicationIcon"],
-            processDetails: mainWinPSDetails,
-            windows: await getWindowPSList(winList, psInfo),
-        };
-
-        if (info.manifest && info.manifest["shortcut"]) {
-            const manifest: any = info.manifest;
-            applicationProcessInfo.title = manifest.shortcut.name;
-            applicationProcessInfo.description = manifest.shortcut.description;
-            applicationProcessInfo.company = manifest.shortcut.company;
-        }
-
-        return applicationProcessInfo;
-
-    }));
-}
-
-export const getPIDEntities = async (pid: number):Promise<EntityProcessDetails[]> => {
-    return [];
-}
-
-export const closeAllApplications = async () => {
-    const myUUID = getCurrentUUID();
-    const procs = await fin.System.getProcessList();
-    return Promise.all(procs.map( async p => {
-        if (p.uuid !== myUUID) {
-            const app = await fin.Application.wrap({ uuid: p.uuid});
-            app.quit(true);
-        }
-    }))
-}
-
-export const launchApplication = async ({manifestURL, applicationURL }) => {
-    if ( manifestURL !== '' ) {
-        return fin.Application.startFromManifest(manifestURL);
-    } else if ( applicationURL !== '' ) {
-        const appUUID = url2AppUUID(applicationURL);
-        const opts = Object.assign({}, defaultAppOptions, {
-            name: url2AppName(applicationURL), 
-            uuid: appUUID, url: applicationURL, 
-            mainWindowOptions: {
-                 name: appUUID,
-            },
-        });
-        return fin.Application.start(opts);
-    } else {
-        throw new Error('invalid arguments, must supply manifest or application url')
-    }
-}
-
-export const getCurrentUUID = () => {
+const getUUID = () => {
     return fin.Application.getCurrentSync().identity.uuid
 }
 
-export const getLogs = async ():Promise<any[]> => {
-    const logs = await fin.System.getLogList();
-    const dateOpts = {year: 'numeric', month: '2-digit', day: '2-digit'};
-    const timeOpts = {hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'};
-    return logs.map(l => {
-        const logDate = new Date(Date.parse(l.date || ''));
-        const logSize = l.size || 0;
-        const newInfo = {
-            fileName: l.name || '',
-            size: logSize,
-            formattedSize: formatBytes(logSize, 1),
-            date: logDate,
-            formattedDate: logDate.toLocaleDateString('en-US', dateOpts) + ' ' + logDate.toLocaleTimeString('en-US', timeOpts)
+const getAppWindows = async (app: OpenFin.Application): Promise<WinProcessModel[]> => {
+    const mWin = await app.getWindow();
+    const winList:OpenFin.Window[] = await app.getChildWindows();
+    winList.push(mWin);
+
+    let winModels = await Promise.all(winList.map(async (w) => {
+        const key = `${app.identity.uuid}_${w.identity.name}`;
+        const views = await getWindowViews(w, key);
+        const winfo = await w.getInfo();
+        const isShowing = await w.isShowing();
+        return {
+            identity: {...w.identity },
+            entityType: EntityType.Window,
+            title: winfo.title,
+            url: winfo.url,
+            visible: isShowing,
+            views: views,
+            key: key
         };
-        return newInfo;        
-    });
+    }));
+    winModels = winModels.sort(titleSorter);
+    return winModels;
 }
 
-export const openLog = async (l):Promise<void> => {
-    return fin.System.openUrlWithBrowser(l.fileName);
+const getWindowViews = async (win:OpenFin.Window, parentKey: string): Promise<ViewProcessModel[]> => {
+    const views = await win.getCurrentViews();
+    let viewModels = await Promise.all(views.map(async(v) => {
+        const info = await v.getInfo();
+        return {
+            identity: {...v.identity },
+            entityType: EntityType.View,
+            title: info.title,
+            url: info.url,
+            visible: true,
+            key: `${parentKey}_${v.identity.uuid}`
+        };
+    }));
+    viewModels = viewModels.sort(titleSorter);
+    return viewModels;
+};
+
+const stringCompare = (a, b) => {
+    return a.localeCompare(b);
 }
 
-export const copyLogPath = async (l):Promise<void> => {
-    navigator.clipboard.writeText(l.fileName)
+const titleSorter = (a, b) => {
+    return stringCompare(a.title, b.title);
 }
 
-export const getWorkspaceItems = async (brightness:number) => {
-    const winList:WindowDetail[] = [];
-    const list = await fin.System.getAllWindows();
-    const allWins = list.map(w => [w.mainWindow!].concat(w.childWindows!).map(cw => 
-        Object.assign(cw, {
-            uuid: w.uuid!,
-            parentName: '',
-            parentUUID: '',
-            color: getRandomFillColor(w.uuid!, cw.name!, brightness),
-            area: 0,
-            showing: false
-        }))
-    ).reduce( (p,c) => p.concat(c), []);
-    for (const w of allWins) {
-        const fInfo = await fin.Frame.wrapSync({uuid: w.uuid!, name: w.name!}).getInfo()
-        w.parentName = fInfo.parent.name||'';
-        w.parentUUID = fInfo.parent.uuid;
-        const ofWin = await fin.Window.wrap(w);
-        const info = await ofWin.getInfo();
-        w.showing = await ofWin.isShowing();
-        w.area = calcWindowArea(w);
-        winList.push(w);
-    }
-    return winList;
+const titleUUIDSorter = (a, b) => {
+    return stringCompare(a.title || a.identity.uuid, b.title || b.identity.uuid);
 }
 
 const calcWindowArea = (win:WindowInfo) => {
     return (win.right! - win.left!)*(win.bottom! - win.top!);
 }
 
-export const getWorkspaceInfo = async (): Promise<WorkspaceInfo> => {
-    const monInfo = await fin.System.getMonitorInfo();
-    const mons = getAllMonitors(monInfo);
-    return {
-        virtualTop: monInfo.virtualScreen.top,
-        virtualLeft: monInfo.virtualScreen.left,
-        virtualHeight: monInfo.virtualScreen.bottom - monInfo.virtualScreen.top, 
-        virtualWidth: monInfo.virtualScreen.right - monInfo.virtualScreen.left,
-        monitors: mons
-    };
-}
-
-const getAllMonitors = (mons: MonitorInfo): Monitor[] => {
+const getAllMonitors = (mons: OpenFin.MonitorInfo): Monitor[] => {
     const infos:Monitor[] = [];
     const pInfo = mons.primaryMonitor.monitorRect;
     infos[0] = { "top": pInfo.top, left: pInfo.left, bottom: pInfo.bottom, right: pInfo.right, name: 'Main Monitor'};

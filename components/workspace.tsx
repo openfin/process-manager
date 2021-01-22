@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { getWorkspaceItems, getWorkspaceInfo, WorkspaceInfo, Monitor, WindowInfo } from '../hooks/api';
+import getAPI, { WorkspaceInfo, Monitor, WindowInfo } from '../hooks/api';
 
 export const Workspace = ({ pollForData, height, width, labelHeight, brightness }) => {
     const defaultSize = { height: height, width: width };
@@ -107,12 +107,13 @@ export const Workspace = ({ pollForData, height, width, labelHeight, brightness 
         ctx.fillText(label, scaledL+xoffset+5, (labelHeight/2)+6, scaledW);
     }
 
+    let resizing = false;
     const pollWorkspace = async () => {
-        if (pollForData) {
-            const info = await getWorkspaceInfo()
+        if (pollForData && !resizing) {
+            const info = await getAPI().getWorkspaceInfo()
             setInfo(info)
             calcSize();
-            const w = await getWorkspaceItems(brightness);
+            const w = await getAPI().getWorkspaceItems(brightness);
             setItems(w);
             renderCanvas();
         }
@@ -120,6 +121,7 @@ export const Workspace = ({ pollForData, height, width, labelHeight, brightness 
 
     let timer = 0;
     const startPolling = () => {
+        pollWorkspace();
         timer = window.setInterval(() => pollWorkspace(), 1000);
     }
 
@@ -131,11 +133,11 @@ export const Workspace = ({ pollForData, height, width, labelHeight, brightness 
         startPolling()
         let resizeTimeout = 0;
         const resizer = () => {
-            stopPolling();
+            resizing = true;
             clearTimeout(resizeTimeout);
             resizeTimeout = window.setTimeout(()=> {
                 calcSize();
-                startPolling();
+                resizing = false;
             }, 100);
         };
         window.addEventListener('resize', resizer);

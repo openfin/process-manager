@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getLogs, openLog, copyLogPath } from '../hooks/api';
+import getAPI from '../hooks/api';
 import { Table, Space, Button } from 'antd';
-import { CopyOutlined, FileTextOutlined } from '@ant-design/icons';
+import { CopyOutlined } from '@ant-design/icons';
 export const LogList = ({ pollForData }) => {
     const size = "small"
     let timer = 0;
@@ -30,20 +30,20 @@ export const LogList = ({ pollForData }) => {
             width: '20%',
             key: 'actions',
             render: (text, record) => <Space size={size}>
-                <Button title="Open Log File" type="primary" size={size} onClick={() => openLog(record)} icon={<FileTextOutlined />}></Button>
-                <Button title="Copy File Path" type="primary" size={size} onClick={() => copyLogPath(record)} icon={<CopyOutlined />}></Button>
+                <Button title="Copy File Path" type="primary" size={size} onClick={() => getAPI().copyLogPath(record)} icon={<CopyOutlined />}></Button>
             </Space>,
         },
     ];
 
     const pollLogs = async () => {
         if (pollForData) {
-            const logList = await getLogs();
+            const logList = await getAPI().getLogs();
             setData(logList);
         }
     }
 
     const startPolling = () => {
+        pollLogs()
         timer = window.setInterval(() => pollLogs(), 1000);
     }
 

@@ -74,25 +74,13 @@ p.error {
 }
 
 .row_application {
-    background-color: #f7f7f7;
+    background-color: none;
 }
 
 .row_window {
-    background-color: #eee;
+    background-color: #fafafa;
 }
 
 .row_view {
-    background-color: #e7e7e7;
-}
-
-.ant-table-cell-fix-left, .ant-table-cell-fix-right {
-    background: inherit;
-}
-
-.ant-table-tbody > tr.ant-table-row:hover > td {
-    background: none;
-}
-
-thead[class*="ant-table-thead"] th {
-    background-color: #eee !important;
+    background-color: #f3f3f3;
 }
