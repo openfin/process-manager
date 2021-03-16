@@ -13,7 +13,6 @@ export const ProcessActions = ({ item, infoHandler }) => {
     }, [])
 
     const size = 'small';
-    const buttonType = 'primary';
 
     const showDevTools = () => {
         getAPI().showDeveloperTools(item.identity, item.entityType);
@@ -58,21 +57,15 @@ export const ProcessActions = ({ item, infoHandler }) => {
     let winButtons = [];
     if (item.entityType === 'window') {
         winButtons = [
-            <Button key={2} title={item.visible ? 'hide window' : 'show window'} type="primary" style={getButtonStyle()} size={size} 
-                onClick={toggleWindowVis} 
-                icon={item.visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
-                disabled={isButtonDisabled()}></Button>,
-            <Button key={1} title="move window onscreen" type="primary" style={getButtonStyle()} size={size} onClick={rescueWin} icon={<MedicineBoxOutlined/>}></Button>,
+            <Button title={item.visible ? 'hide window' : 'show window'} onClick={toggleWindowVis} icon={item.visible ? <EyeOutlined /> : <EyeInvisibleOutlined />} disabled={isButtonDisabled()} size={size} key={1}></Button>,
+            <Button title="move window onscreen" onClick={rescueWin} icon={<MedicineBoxOutlined/>} size={size} key={2}></Button>,
         ]
     }
 
     return <Space size={size}>
-        <Button title="launch dev tools" type="primary" style={getButtonStyle()} size={size} onClick={showDevTools} icon={<CodeOutlined />}></Button>
-        <Button title={`show ${item.entityType} info`} type="primary" style={getButtonStyle()} size={size} onClick={showInfo} 
-            icon={<InfoCircleOutlined />}></Button>
-        <Button title={`close ${item.entityType}`} type="primary" style={getButtonStyle()} size={size} onClick={close} 
-            icon={<CloseCircleOutlined />} 
-            disabled={isButtonDisabled()}></Button>
+        <Button title="dev tools" type="primary" onClick={showDevTools} icon={<CodeOutlined />} size={size}></Button>
+        <Button title={`show ${item.entityType} info`} type="primary" onClick={showInfo} icon={<InfoCircleOutlined />} size={size}></Button>
+        <Button title={`close ${item.entityType}`} type="primary" onClick={close} icon={<CloseCircleOutlined />} disabled={isButtonDisabled()} size={size}></Button>
         {winButtons}
     </Space>
 }

@@ -15,7 +15,7 @@ export default function Tree() {
       <PageHeader title="Process Manager - Logs" />
       <main>
         <ViewHeader checked={autoRefresh} onChange={onRefreshToggle} />
-        <Workspace height="600" width="800" labelHeight="28" brightness="150" pollForData={autoRefresh}/>
+        <Workspace initialHeight="600" initialWidth="800" labelHeight="28" brightness="150" pollForData={autoRefresh}/>
       </main>
     </div>
   )

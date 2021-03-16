@@ -152,6 +152,7 @@ export default {
     getLogs: async ():Promise<any[]> => {
         return [
             {
+                key: "debug.log",
                 fileName: "debug.log",
                 formattedDate: "12/14/2020 15:18:05",
                 formattedSize: "7.4KB",

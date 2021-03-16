@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import getAPI, { WorkspaceInfo, Monitor, WindowInfo } from '../hooks/api';
 
-export const Workspace = ({ pollForData, height, width, labelHeight, brightness }) => {
-    const defaultSize = { height: height, width: width };
-    const defaultInfo:WorkspaceInfo = { virtualHeight: height, virtualWidth: width, virtualTop: 0, virtualLeft: 0, monitors: []}
+export const Workspace = ({ pollForData, initialWidth, initialHeight, labelHeight, brightness }) => {
+    const defaultSize = { height: initialWidth, width: initialHeight };
+    const defaultInfo:WorkspaceInfo = { virtualHeight: initialHeight, virtualWidth: initialWidth, virtualTop: 0, virtualLeft: 0, monitors: []}
 
     const [size, setSize] = useState(defaultSize);
     const [info, setInfo] = useState(defaultInfo)
     const [items, setItems] = useState([])
+    const [resizing, setResizing] = useState(false);
 
     const canvasRef = useRef();
     const labelCanvasRef = useRef();
@@ -107,7 +108,6 @@ export const Workspace = ({ pollForData, height, width, labelHeight, brightness 
         ctx.fillText(label, scaledL+xoffset+5, (labelHeight/2)+6, scaledW);
     }
 
-    let resizing = false;
     const pollWorkspace = async () => {
         if (pollForData && !resizing) {
             const info = await getAPI().getWorkspaceInfo()
@@ -119,33 +119,33 @@ export const Workspace = ({ pollForData, height, width, labelHeight, brightness 
         }
     }
 
-    let timer = 0;
+    let pollingTimer = 0;
     const startPolling = () => {
-        pollWorkspace();
-        timer = window.setInterval(() => pollWorkspace(), 1000);
+        pollWorkspace()
+        pollingTimer = window.setInterval(() => pollWorkspace(), 1000);
     }
 
     const stopPolling = () => {
-        window.clearInterval(timer);
+        window.clearInterval(pollingTimer);
     }
 
     useEffect(() => {
-        startPolling()
         let resizeTimeout = 0;
         const resizer = () => {
-            resizing = true;
+            setResizing(true);
             clearTimeout(resizeTimeout);
             resizeTimeout = window.setTimeout(()=> {
                 calcSize();
-                resizing = false;
+                setResizing(false);
             }, 100);
         };
         window.addEventListener('resize', resizer);
+        startPolling();
         return () => {
-            stopPolling()
             window.removeEventListener('resize', resizer)
+            stopPolling();
         }
-    })
+    }, [pollForData])
 
     return <div>
         <canvas id="workspace-labels" ref={labelCanvasRef} width={size.width} height={labelHeight} />

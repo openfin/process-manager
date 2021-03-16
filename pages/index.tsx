@@ -94,10 +94,10 @@ export default function Home() {
                         </div>
                     } onChange={onTabChange} type="card">
                     <Tabs.TabPane tab="Applications" key="1">
-                        <ProcessTree headerHeight={115} scrollX={800} scrollY={600} pollForData={selectedTab === "1"} />
+                        <ProcessTree headerHeight={115} initialWidth={800} initialHeight={600} pollForData={selectedTab === "1"} />
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="Screens" key="2">
-                        <Workspace brightness={150} labelHeight={28} height={800} width={600} pollForData={selectedTab === "2"} />
+                        <Workspace brightness={150} labelHeight={28} initialWidth={800} initialHeight={600} pollForData={selectedTab === "2"} />
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="Logs" key="3">
                         <LogList pollForData={selectedTab === "3"} />

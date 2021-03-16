@@ -19,7 +19,7 @@ export default function Tree() {
             <Button size="small">Open</Button>
             <Button size="small">Launch</Button>
         </ViewHeader>
-        <ProcessTree headerHeight={115} scrollX={800} scrollY={600} pollForData={autoRefresh}/>
+        <ProcessTree headerHeight={115} initialWidth={800} initialHeight={600} pollForData={autoRefresh}/>
       </main>
     </div>
   )

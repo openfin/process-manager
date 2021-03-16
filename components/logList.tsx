@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import getAPI from '../hooks/api';
 import { Table, Space, Button } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
+
 export const LogList = ({ pollForData }) => {
     const size = "small"
-    let timer = 0;
     const [data, setData] = useState([]);
     const columns = [
         {
@@ -42,19 +42,20 @@ export const LogList = ({ pollForData }) => {
         }
     }
 
+    let pollingTimer = 0;
     const startPolling = () => {
         pollLogs()
-        timer = window.setInterval(() => pollLogs(), 1000);
+        pollingTimer = window.setInterval(() => pollLogs(), 1000);
     }
 
     const stopPolling = () => {
-        window.clearInterval(timer);
+        window.clearInterval(pollingTimer);
     }
 
     useEffect(() => {
         startPolling()
         return () => stopPolling()
-    })
+    }, [pollForData])
 
     return <Table
         size="small"

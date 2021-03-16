@@ -1,181 +1,136 @@
+import { useState, useEffect, useRef } from 'react';
 import * as React from 'react';
 import { Modal, Table, Button } from 'antd';
-import getAPI, { EntityType, ProcessModel } from '../hooks/api';
+import getAPI, { EntityType } from '../hooks/api';
 import { TableHeader } from './tableHeader';
 import { ProcessActions } from './processActions';
 import { AppLink } from './appLink';
 
-interface ProcessTreeProps {
-    pollForData: boolean;
-    headerHeight: number;
-    scrollX: number;
-    scrollY: number;
-}
+declare type FixedType = 'left' | 'center' | 'right';
+const left:FixedType = 'left';
+const right:FixedType = 'right';
 
-interface ProcessTreeState {
-    tree: ProcessModel;
-    columns: any[];
-    modalVisible: boolean;
-    modalTitle: string;
-    modalContents: string;
-    scrollX: number;
-    scrollY: number;
-    expandedRows: string[];
-}
-
-export class ProcessTree extends React.Component<ProcessTreeProps, ProcessTreeState> {
-    timer = 0;
-    resizing = false;
-    components = {
+export const ProcessTree = ({ pollForData, headerHeight, initialWidth, initialHeight }) => {
+    const components = {
         header: {
             cell: TableHeader
         }
     }
-    expandable = {
-        onExpandedRowsChange: (expRows:string[]) => {
-            console.log('expanding', expRows);
-            this.setState({ expandedRows: expRows});
+
+    const columns = [
+        {
+            title: 'Name',
+            dataIndex: 'title',
+            key: 'name',
+            render: (text, record) => {
+                if (record.entityType === EntityType.Application) {
+                    return <AppLink uuid={record.identity.uuid} text={record.identity.uuid} />
+                }
+                return record.identity.name || record.identity.uuid
+            },
+            width: '40%',
+            ellipsis: true,
+            fixed: left,
         },
-    }
+        {
+            title: 'URL',
+            dataIndex: 'url',
+            key: 'url',
+            width: '40%',
+            ellipsis: true,
+        },
+        {
+            title: 'Actions',
+            width: 200,
+            key: 'actions',
+            render: (text, record) => <ProcessActions item={record} infoHandler={showInfo}/>,
+            fixed: right,
+        },
+    ];
 
-    constructor(props: ProcessTreeProps) {
-        super(props);
-        this.state = {
-            columns: [
-                {
-                    title: 'Name',
-                    dataIndex: 'title',
-                    key: 'name',
-                    render: (text, record) => {
-                        if (record.entityType === EntityType.Application) {
-                            return <AppLink uuid={record.identity.uuid} text={record.identity.uuid} />
-                        }
-                        return record.identity.name || record.identity.uuid
-                    },
-                    width: 250,
-                    ellipsis: true,
-                    fixed: 'left',
-                },
-                {
-                    title: 'URL',
-                    dataIndex: 'url',
-                    key: 'url',
-                    width: 450,
-                    ellipsis: true,
-                },
-                {
-                    title: 'Actions',
-                    width: 200,
-                    key: 'actions',
-                    render: (text, record) => <ProcessActions item={record} infoHandler={this.showInfo.bind(this)}/>,
-                    fixed: 'right',
-                    resizable: false,
-                },
-            ],
-            tree: { applications: [] },
-            modalTitle: '',
-            modalVisible: false,
-            modalContents: '',
-            scrollX: props.scrollX,
-            scrollY: props.scrollY,
-            expandedRows: [],
-        };
-    }
+    const [resizing, setResizing] = useState(false);
+    const [scrollX, setScrollX] = useState(initialWidth);
+    const [scrollY, setScrollY] = useState(initialHeight);
+    const [expandedRows, setExpandedRows] = useState([]);
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalContents, setModalContents] = useState('');
+    const [modalVisible, setModalVisible] = useState(false);
+    const [tree, setTree] = useState({applications: []});
 
-    componentDidMount() {
-        this.startPolling();
-        this.setSize();
-        let resizeTimeout = 0;
-        window.addEventListener('resize', () => {
-            this.resizing = true;
-            clearTimeout(resizeTimeout);
-            resizeTimeout = window.setTimeout(()=> {
-                this.setSize();
-                this.resizing = false;
-            }, 100);
-        });
-    }
+    let pollingTimer = 0;
 
-    componentWillUnmount() {
-        this.stopPolling();
-    }
-
-    render() {
-        const columns = this.state.columns.map((col, index) => ({
-            ...col,
-            onHeaderCell: (column) => ({
-                width: column.width,
-                onResize: this.handleColumnResize(index),
-                resizable: column.resizable,
-            })
-        }));
-        return <div>
-            <Table
-                bordered
-                sticky
-                pagination={false}
-                columns={columns}
-                components={this.components}
-                dataSource={(this.state as ProcessTreeState).tree.applications}
-                scroll={{ x: (this.state as ProcessTreeState).scrollX, y: (this.state as ProcessTreeState).scrollY }}
-                size="small"
-                expandable={this.expandable}
-                rowClassName={(record, index) => this.getRowClass(record)}
-            />
-            <Modal className="firstcap" bodyStyle={{textTransform: 'none'}} title={(this.state as ProcessTreeState).modalTitle} visible={(this.state as ProcessTreeState).modalVisible} onCancel={this.hideModal.bind(this)} footer={[
-                <Button key="1" onClick={this.hideModal.bind(this)}>Close</Button>
-                ]}>
-                <pre>{(this.state as ProcessTreeState).modalContents}</pre>
-            </Modal>
-        </div>;
-    }
-
-    startPolling() {
-        this.pollForApps();
-        this.timer = window.setInterval(() => this.pollForApps(), 1000);
-    }
-
-    stopPolling() {
-        window.clearInterval(this.timer);
-    }
-
-    private async pollForApps() {
-        if (this.props.pollForData && !this.resizing) {
+    const pollForApps = async () => {
+        if (pollForData && !resizing) {
             const procModel = await getAPI().getProcessTree();
-            this.setState({ tree: procModel });
+            setTree(procModel)
         }
     }
 
-    async showInfo(item: any) {
+    const startPolling = () => {
+        pollForApps()
+        pollingTimer = window.setInterval(() => pollForApps(), 1000);
+    }
+
+    const stopPolling = () => {
+        window.clearInterval(pollingTimer);
+    }
+
+    const calcSize = () => {
+        let h = document.body.clientHeight - headerHeight;
+        setScrollY(h);
+    }
+
+    const showInfo = async (item: any) => {
         const info = await getAPI().getItemInfo(item.identity, item.entityType);
-        this.showModal(`${item.entityType} Info`, JSON.stringify(info, null, 4));
+        showModal(`${item.entityType} Info`, JSON.stringify(info, null, 4));
     }
 
-    showModal(title: string, contents: string) {
-        this.setState({ modalVisible: true, modalTitle: title, modalContents: contents });
+    const showModal = (title: string, contents: string) => {
+        setModalVisible(true);
+        setModalTitle(title);
+        setModalContents(contents);
     }
 
-    hideModal() {
-        this.setState({ modalVisible: false });
+    const hideModal = () => {
+        setModalVisible(false);
     }
 
-    handleColumnResize = (index) => (e, { size }) => {
-        this.setState(({ columns }) => {
-            const nextColumns = [...columns];
-            nextColumns[index] = {
-                ...nextColumns[index],
-                width: size.width
-            };
-            return { columns: nextColumns };
-        });
-    };
+    useEffect(() => {
+        let resizeTimeout = 0;
+        const resizer = () => {
+            setResizing(true);
+            clearTimeout(resizeTimeout);
+            resizeTimeout = window.setTimeout(()=> {
+                calcSize();
+                setResizing(false);
+            }, 100);
+        };
+        window.addEventListener('resize', resizer);
+        startPolling();
+        return () => {
+            window.removeEventListener('resize', resizer)
+            stopPolling();
+        }
+    }, [pollForData])
 
-    setSize() {
-        let h = document.body.clientHeight - this.props.headerHeight;
-        this.setState({scrollY: h});
-    }
-
-    getRowClass(record) {
-        return `row_${record.identity.entityType}`
-    }
+    return <div>
+        <Table
+            bordered
+            sticky
+            pagination={false}
+            columns={columns}
+            components={components}
+            dataSource={tree.applications}
+            scroll={{ x: scrollX, y: scrollY }}
+            size="small"
+            expandable={{onExpandedRowsChange: (expRows:string[]) => {
+                setExpandedRows(expRows)
+            }}}
+        />
+        <Modal className="firstcap" bodyStyle={{textTransform: 'none'}} title={modalTitle} visible={modalVisible} onCancel={hideModal} footer={[
+            <Button key="1" onClick={hideModal}>Close</Button>
+            ]}>
+            <pre>{modalContents}</pre>
+        </Modal>
+    </div>;
 }

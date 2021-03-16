@@ -1,4 +1,4 @@
-import 'antd/dist/antd.min.css';
+import '../styles/openfin-antd.css'
 import '../styles/globals.css'
 
 function MyApp({ Component, pageProps }) {

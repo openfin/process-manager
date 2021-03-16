@@ -92,7 +92,9 @@ export default {
         }
     },
     getAppProcesses: async (uuid: string):Promise<any[]> => {
-        return [];
+        const app = await fin.Application.wrap({uuid});
+        const pinfo = await app.getProcessInfo();
+        return pinfo.entities;
     },
     closeAllApplications: async () => {
         const myUUID = getUUID();

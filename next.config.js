@@ -4,6 +4,7 @@ const path = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const host = process.env.HOST || 'http://localhost:3000';
+const basePath = process.env.BASE_PATH || '';
 
 module.exports = {
     async rewrites() {
@@ -36,4 +37,5 @@ module.exports = {
         // Important: return the modified config
         return config
     },
+    basePath: basePath,
 }
