@@ -143,9 +143,7 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
                     }
                     this.processCache[proc.uuid || ''] = appInf as AppInfo;
                     procList[procList.length] = { process: proc, info: appInf as AppInfo, parentUUID: appParent};
-                } else {
-                    console.info({'NoneUuidApp': proc.name });
-                }
+                } 
             }
             this.setState({data: procList});
         }
