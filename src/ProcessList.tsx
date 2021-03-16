@@ -7,6 +7,7 @@ import 'react-table/react-table.css';
 import './interfaces';
 import {formatBytes} from './utils';
 import { ProcessInfo } from 'openfin/_v2/api/system/process';
+import { Application } from 'openfin/_v2/main';
 
 
 interface ProcessListProps {
@@ -131,16 +132,21 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
             const procList:AppProcessInfo[] = [];
             for (let i = 0; i < procs.length; i++) {
                 const proc = procs[i];
-                const app = await fin.Application.wrap({ uuid: proc.uuid||''});
-                const appInf = await app.getInfo();
-                let appParent = '';
-                try {
-                    appParent = await app.getParentUuid();
-                } catch(e) {
-                    //console.log('no parent app for: '+ proc.uuid);
+                if(proc.uuid) {
+                    const app = await fin.Application.wrap({ uuid: proc.uuid||''});
+                    const appInf = await app.getInfo();
+                    let appParent = '';
+                    try {
+                        appParent = await app.getParentUuid();
+                    } catch(e) {
+                        //console.log
+                        ('no parent app for: '+ proc.uuid);
+                    }
+                    this.processCache[proc.uuid || ''] = appInf as AppInfo;
+                    procList[procList.length] = { process: proc, info: appInf as AppInfo, parentUUID: appParent};
+                } else {
+                    console.info({'NoneUuidApp': proc.name });
                 }
-                this.processCache[proc.uuid || ''] = appInf as AppInfo;
-                procList[procList.length] = { process: proc, info: appInf as AppInfo, parentUUID: appParent};
             }
             this.setState({data: procList});
         }
