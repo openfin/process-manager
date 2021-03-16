@@ -7,7 +7,6 @@ import 'react-table/react-table.css';
 import './interfaces';
 import {formatBytes} from './utils';
 import { ProcessInfo } from 'openfin/_v2/api/system/process';
-import { Application } from 'openfin/_v2/main';
 
 
 interface ProcessListProps {
