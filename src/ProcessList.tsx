@@ -138,7 +138,7 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
                     try {
                         appParent = await app.getParentUuid();
                     } catch(e) {
-                        console.error(`App: ${proc.uuid} has no parent process.`)
+                        // eat error to prevent flooding
                     }
                     this.processCache[proc.uuid || ''] = appInf as AppInfo;
                     procList[procList.length] = { process: proc, info: appInf as AppInfo, parentUUID: appParent};
