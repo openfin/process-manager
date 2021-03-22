@@ -3,9 +3,20 @@ import getAPI from '../hooks/api';
 import { Table, Space, Button } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 
-export const LogList = ({ pollForData }) => {
-    const size = "small"
+import { usePolling } from '../hooks/utils';
+
+function useGetLogs(pollRate) {
     const [data, setData] = useState([]);
+    usePolling(async () => {
+        const logList = await getAPI().getLogs();
+        setData(logList);
+    }, pollRate, 'logs')
+    return data;
+}
+
+export const LogList = ({ pollRate }) => {
+    const size = "small"
+    const data = useGetLogs(pollRate);
     const columns = [
         {
             title: 'Date/Time',
@@ -34,28 +45,6 @@ export const LogList = ({ pollForData }) => {
             </Space>,
         },
     ];
-
-    const pollLogs = async () => {
-        if (pollForData) {
-            const logList = await getAPI().getLogs();
-            setData(logList);
-        }
-    }
-
-    let pollingTimer = 0;
-    const startPolling = () => {
-        pollLogs()
-        pollingTimer = window.setInterval(() => pollLogs(), 1000);
-    }
-
-    const stopPolling = () => {
-        window.clearInterval(pollingTimer);
-    }
-
-    useEffect(() => {
-        startPolling()
-        return () => stopPolling()
-    }, [pollForData])
 
     return <Table
         size="small"

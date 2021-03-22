@@ -1,4 +1,4 @@
-import { formatBytes, defaultAppOptions, url2AppName, url2AppUUID, getRandomFillColor } from './utils'
+import { formatBytes, url2AppName, url2AppUUID, getRandomFillColor } from './utils'
 import { EntityType, AppProcessModel, WinProcessModel, ViewProcessModel, WorkspaceItem } from './api'
 
 import { WindowInfo, WorkspaceInfo, Monitor } from './api'
@@ -212,6 +212,20 @@ interface processNode {
 const getUUID = () => {
     return fin.Application.getCurrentSync().identity.uuid
 }
+
+const defaultAppOptions = {
+    "name" : "",
+    "uuid": "",
+    "url" : "",
+    "mainWindowOptions" : {
+        defaultHeight : 500,
+        defaultWidth: 420,
+        defaultTop: 120,
+        defaultLeft: 120,
+        saveWindowState: false,
+        autoShow: true
+    }
+};
 
 const getAppWindows = async (app: OpenFin.Application): Promise<WinProcessModel[]> => {
     const mWin = await app.getWindow();

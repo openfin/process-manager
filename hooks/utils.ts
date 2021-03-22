@@ -1,8 +1,62 @@
+import { useEffect, useRef, useState } from 'react';
+
+export const usePolling = (callback, interval = 1000, name = '') => {
+    const savedCallback = useRef<() => any>();
+    const timeoutId = useRef<number>();
+
+    // Remember the latest callback.
+    useEffect(() => {
+      savedCallback.current = callback;
+    }, [callback]);
+
+    useEffect(() => {
+        const tick = async () => {
+            // console.log(`${name} polling`)
+            try {
+                await savedCallback.current();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        let timeout = setInterval(tick, interval);
+        timeoutId.current = timeout as unknown as number;
+        tick();
+        return () => {
+            // console.log(`${name} not polling`)
+            clearInterval(timeoutId.current);
+        }
+    }, [interval]);
+}
+
+export const useWindowSize = () => {
+    const [windowSize, setWindowSize] = useState({
+      width: undefined,
+      height: undefined,
+    });
+  
+    useEffect(() => {
+      function handleResize() {
+        setWindowSize({
+          width: document.body.clientWidth,
+          height: document.body.clientHeight,
+        });
+      }
+
+      // call handler right away and attach lsitener
+      handleResize();
+      window.addEventListener("resize", handleResize);    
+      
+      // Remove event listener on cleanup
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
+  
+    return windowSize;
+}
+
+// format a number as bytes (example: 1024 => 1KB)
 const KB = 1024;
 const MB = KB * 1024;
 const GB = MB * 1024;
-
-// format a number as bytes (example: 1024 => 1KB)
 export const formatBytes = (size:number, places: number) => {
     if (size > GB) {
         return (size / GB).toFixed(places) + 'GB';
@@ -14,20 +68,6 @@ export const formatBytes = (size:number, places: number) => {
         return '0';
     } else {
         return size.toFixed(1) + 'B';
-    }
-};
-
-export const defaultAppOptions = {
-    "name" : "",
-    "uuid": "",
-    "url" : "",
-    "mainWindowOptions" : {
-        defaultHeight : 500,
-        defaultWidth: 420,
-        defaultTop: 120,
-        defaultLeft: 120,
-        saveWindowState: false,
-        autoShow: true
     }
 };
 

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import * as React from 'react';
 import { Modal, Table, Button } from 'antd';
 import getAPI, { EntityType } from '../hooks/api';
+import { usePolling } from '../hooks/utils';
 import { TableHeader } from './tableHeader';
 import { ProcessActions } from './processActions';
 import { AppLink } from './appLink';
@@ -10,7 +11,16 @@ declare type FixedType = 'left' | 'center' | 'right';
 const left:FixedType = 'left';
 const right:FixedType = 'right';
 
-export const ProcessTree = ({ pollForData, headerHeight, initialWidth, initialHeight }) => {
+function useProcessTree(pollRate) {
+    const [tree, setTree] = useState({applications:[]});
+    usePolling(async () => {
+        const t = await getAPI().getProcessTree()
+        setTree(t)
+    }, pollRate, 'tree')
+    return tree;
+}
+
+export const ProcessTree = ({ pollRate }) => {
     const components = {
         header: {
             cell: TableHeader
@@ -28,7 +38,7 @@ export const ProcessTree = ({ pollForData, headerHeight, initialWidth, initialHe
                 }
                 return record.identity.name || record.identity.uuid
             },
-            width: '40%',
+            width: '30%',
             ellipsis: true,
             fixed: left,
         },
@@ -36,7 +46,7 @@ export const ProcessTree = ({ pollForData, headerHeight, initialWidth, initialHe
             title: 'URL',
             dataIndex: 'url',
             key: 'url',
-            width: '40%',
+            width: '90%',
             ellipsis: true,
         },
         {
@@ -48,37 +58,11 @@ export const ProcessTree = ({ pollForData, headerHeight, initialWidth, initialHe
         },
     ];
 
-    const [resizing, setResizing] = useState(false);
-    const [scrollX, setScrollX] = useState(initialWidth);
-    const [scrollY, setScrollY] = useState(initialHeight);
+    const tree = useProcessTree(pollRate)
     const [expandedRows, setExpandedRows] = useState([]);
     const [modalTitle, setModalTitle] = useState('');
     const [modalContents, setModalContents] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
-    const [tree, setTree] = useState({applications: []});
-
-    let pollingTimer = 0;
-
-    const pollForApps = async () => {
-        if (pollForData && !resizing) {
-            const procModel = await getAPI().getProcessTree();
-            setTree(procModel)
-        }
-    }
-
-    const startPolling = () => {
-        pollForApps()
-        pollingTimer = window.setInterval(() => pollForApps(), 1000);
-    }
-
-    const stopPolling = () => {
-        window.clearInterval(pollingTimer);
-    }
-
-    const calcSize = () => {
-        let h = document.body.clientHeight - headerHeight;
-        setScrollY(h);
-    }
 
     const showInfo = async (item: any) => {
         const info = await getAPI().getItemInfo(item.identity, item.entityType);
@@ -95,24 +79,6 @@ export const ProcessTree = ({ pollForData, headerHeight, initialWidth, initialHe
         setModalVisible(false);
     }
 
-    useEffect(() => {
-        let resizeTimeout = 0;
-        const resizer = () => {
-            setResizing(true);
-            clearTimeout(resizeTimeout);
-            resizeTimeout = window.setTimeout(()=> {
-                calcSize();
-                setResizing(false);
-            }, 100);
-        };
-        window.addEventListener('resize', resizer);
-        startPolling();
-        return () => {
-            window.removeEventListener('resize', resizer)
-            stopPolling();
-        }
-    }, [pollForData])
-
     return <div>
         <Table
             bordered
@@ -121,7 +87,6 @@ export const ProcessTree = ({ pollForData, headerHeight, initialWidth, initialHe
             columns={columns}
             components={components}
             dataSource={tree.applications}
-            scroll={{ x: scrollX, y: scrollY }}
             size="small"
             expandable={{onExpandedRowsChange: (expRows:string[]) => {
                 setExpandedRows(expRows)

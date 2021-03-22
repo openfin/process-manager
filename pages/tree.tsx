@@ -5,21 +5,21 @@ import { ProcessTree }  from '../components/processTree'
 import { Button } from 'antd';
 
 export default function Tree() {
-  const [autoRefresh, setAutoRefresh] = useState(true)
+  const [refreshRate, setRefreshRate] = useState(1000)
 
-  const onRefreshToggle = (v) => {
-    setAutoRefresh(v)
+  const onRefreshUpdate = (v) => {
+    setRefreshRate(v)
   }
 
   return (
     <div>
       <PageHeader title="Process Manager - Applications" />
       <main>
-        <ViewHeader checked={autoRefresh} onChange={onRefreshToggle}>
+        <ViewHeader onChange={onRefreshUpdate}>
             <Button size="small">Open</Button>
             <Button size="small">Launch</Button>
         </ViewHeader>
-        <ProcessTree headerHeight={115} initialWidth={800} initialHeight={600} pollForData={autoRefresh}/>
+        <ProcessTree pollRate={refreshRate}/>
       </main>
     </div>
   )

@@ -21,7 +21,7 @@ export default function PID() {
         <div>
             <PageHeader title={`Process Manager - App: ${uuid}`} />
             <main>
-                <ViewHeader checked={autoRefresh} onChange={onRefreshToggle}></ViewHeader>
+                <ViewHeader onChange={onRefreshToggle}></ViewHeader>
                 <AppView pollForData={autoRefresh} uuid={uuid} />
             </main>
         </div>

@@ -1,19 +1,22 @@
 import * as React from 'react';
-import { Switch } from 'antd';
+import { Slider } from 'antd';
 import { RVMInfo } from './rvmInfo'
 
 interface ViewHeaderProps {
-    checked: boolean;
     onChange: any;
 }
 
-export const ViewHeader = ({ checked, onChange, children }: React.PropsWithChildren<ViewHeaderProps>) => {
+function sliderFormatter(value) {
+    return `${Math.floor(value/1000)}s`;
+}
+
+export const ViewHeader = ({ onChange, children }: React.PropsWithChildren<ViewHeaderProps>) => {
     return <menu>
-        <li>Refresh</li>
-        <li>
-            <Switch checkedChildren="Auto" unCheckedChildren="Man" checked={checked} onChange={onChange} />
-        </li>
         {React.Children.map(children, ch => <li>{ch}</li>)}
+        <li style={{paddingTop:1}}>refresh</li>
+        <li style={{width:70}}>
+            <Slider style={{padding:1}} step={1000} min={1000} max={10000} tipFormatter={sliderFormatter} onChange={onChange} />
+        </li>
         <li className="rhs"><RVMInfo /></li>
     </menu>
 }

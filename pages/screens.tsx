@@ -1,22 +1,22 @@
 import { useState } from 'react';
 import { PageHeader } from '../components/pageHeader'
 import { ViewHeader } from '../components/viewHeader'
-import { Workspace }  from '../components/workspace'
+import { Workspace } from '../components/workspace'
 
 export default function Tree() {
-  const [autoRefresh, setAutoRefresh] = useState(true)
+    const [refreshRate, setRefreshRate] = useState(1000)
 
-  const onRefreshToggle = (v) => {
-    setAutoRefresh(v)
-  }
+    const onRefreshUpdate = (v) => {
+        setRefreshRate(v)
+    }
 
-  return (
-    <div>
-      <PageHeader title="Process Manager - Logs" />
-      <main>
-        <ViewHeader checked={autoRefresh} onChange={onRefreshToggle} />
-        <Workspace initialHeight="600" initialWidth="800" labelHeight="28" brightness="150" pollForData={autoRefresh}/>
-      </main>
-    </div>
-  )
+    return (
+        <div>
+            <PageHeader title="Process Manager - Workspace" />
+            <main>
+                <ViewHeader onChange={onRefreshUpdate} />
+                <Workspace pollRate={refreshRate} initialHeight="600" initialWidth="800" headerHeight="58" brightness="150" />
+            </main>
+        </div>
+    )
 }

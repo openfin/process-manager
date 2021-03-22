@@ -92,15 +92,15 @@ export default function Home() {
                             </Dropdown> : <div/>}
                             <RVMInfo />
                         </div>
-                    } onChange={onTabChange} type="card">
+                    } onChange={onTabChange} type="card" destroyInactiveTabPane={true} >
                     <Tabs.TabPane tab="Applications" key="1">
-                        <ProcessTree headerHeight={115} initialWidth={800} initialHeight={600} pollForData={selectedTab === "1"} />
+                        <ProcessTree pollRate="1000" />
                     </Tabs.TabPane>
-                    <Tabs.TabPane tab="Screens" key="2">
-                        <Workspace brightness={150} labelHeight={28} initialWidth={800} initialHeight={600} pollForData={selectedTab === "2"} />
+                    <Tabs.TabPane tab="Workspace" key="2">
+                        <Workspace pollRate="1000" brightness={150} headerHeight={68} initialWidth={800} initialHeight={600} />
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="Logs" key="3">
-                        <LogList pollForData={selectedTab === "3"} />
+                        <LogList pollRate="1000" />
                     </Tabs.TabPane>
                 </Tabs>
                 <Modal title="Open Application" visible={appModalVisible} onOk={openApplication} onCancel={closeAppModal} okText="Open" cancelText="Cancel">
