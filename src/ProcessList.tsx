@@ -131,16 +131,18 @@ export class ProcessList extends React.Component<ProcessListProps, {}> {
             const procList:AppProcessInfo[] = [];
             for (let i = 0; i < procs.length; i++) {
                 const proc = procs[i];
-                const app = await fin.Application.wrap({ uuid: proc.uuid||''});
-                const appInf = await app.getInfo();
-                let appParent = '';
-                try {
-                    appParent = await app.getParentUuid();
-                } catch(e) {
-                    //console.log('no parent app for: '+ proc.uuid);
-                }
-                this.processCache[proc.uuid || ''] = appInf as AppInfo;
-                procList[procList.length] = { process: proc, info: appInf as AppInfo, parentUUID: appParent};
+                if(proc.uuid) {
+                    const app = await fin.Application.wrap({ uuid: proc.uuid||''});
+                    const appInf = await app.getInfo();
+                    let appParent = '';
+                    try {
+                        appParent = await app.getParentUuid();
+                    } catch(e) {
+                        // eat error to prevent flooding
+                    }
+                    this.processCache[proc.uuid || ''] = appInf as AppInfo;
+                    procList[procList.length] = { process: proc, info: appInf as AppInfo, parentUUID: appParent};
+                } 
             }
             this.setState({data: procList});
         }
