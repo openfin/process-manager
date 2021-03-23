@@ -129,17 +129,19 @@ export default {
         return [
             {
                 key: 1,
-                uuid: 'asdf',
+                pid: 12345,
+                entityType: 'window',
                 url: 'https://some.shit.url/fake/path',
-                cpu: 0,
-                mem: 876678879
+                cpuUsage: 50,
+                privateSetSize: 876678879
             },
             {
                 key: 2,
-                uuid: 'fdsa',
+                pid: 54321,
+                entityType: 'window',
                 url: 'https://some.shit.url/fake/path',
-                cpu: 0,
-                mem: 9267345
+                cpuUsage: 13,
+                privateSetSize: 9267345
             }
         ];
     },

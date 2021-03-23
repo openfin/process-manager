@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import getAPI from '../hooks/api';
-import { usePolling } from '../hooks/utils';
+import { usePolling, formatBytes } from '../hooks/utils';
 import { Table } from 'antd';
 
 function useAppProcesses(pollRate, uuid) {
@@ -41,9 +41,13 @@ export const AppView = ({ uuid, pollRate }) => {
         },
         {
             title: 'Mem',
-            dataIndex: 'mem',
-            key: 'mem',
+            dataIndex: 'privateSetSize',
+            key: 'privateSetSize',
             width: '12%',
+            render: (text, record) => {
+                console.log(`what is mem? ${record.privateSetSize}`)
+                return formatBytes(record.privateSetSize, 1)
+            },
         },
         {
             title: 'Actions',
