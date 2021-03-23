@@ -2,7 +2,7 @@
 const path = require('path')
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-
+const OpenFinPlugin = require('./build-utils/openfinPlugin.js');
 const host = process.env.HOST || 'http://localhost:3000';
 const basePath = process.env.BASE_PATH || '';
 
@@ -32,7 +32,8 @@ module.exports = {
                         }
                     }
                 ]
-            ))    
+            )) 
+            config.plugins.push(new OpenFinPlugin({manifestUrl: 'http://localhost:3000/app.json'}))   
         }
         // Important: return the modified config
         return config

@@ -8,7 +8,7 @@
         "name": "process-manager",
         "version": "2.0.0",
         "description": "Process Manager",
-        "url": "ROOT_URL/index.html",
+        "url": "ROOT_URL",
         "uuid": "process-manager",
         "defaultHeight": 800,
         "defaultWidth": 600,
