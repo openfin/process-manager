@@ -37,5 +37,8 @@ module.exports = {
         // Important: return the modified config
         return config
     },
+    publicRuntimeConfig: {
+        basePath: basePath
+    },
     basePath: basePath,
 }

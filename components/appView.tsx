@@ -1,16 +1,32 @@
 import { useState, useEffect } from 'react';
 import getAPI from '../hooks/api';
+import { usePolling } from '../hooks/utils';
 import { Table } from 'antd';
 
-export const AppView = ({ uuid, pollForData }) => {
-    let timer = 0;
-    const [data, setData] = useState([]);
+function useAppProcesses(pollRate, uuid) {
+    const [list, setList] = useState([]);
+    usePolling(async () => {
+        const procList = await getAPI().getAppProcesses(uuid);
+        setList(procList)
+    }, pollRate, 'app-processes')
+    return list;
+}
+
+export const AppView = ({ uuid, pollRate }) => {
+    const data = useAppProcesses(pollRate, uuid);
+
     const columns = [
         {
-            title: 'UUID',
-            dataIndex: 'uuid',
-            key: 'uuid',
-            width: '12%',
+            title: 'PID',
+            dataIndex: 'pid',
+            key: 'pid',
+            width: '10%',
+        },
+        {
+            title: 'Entity',
+            dataIndex: 'entityType',
+            key: 'entityType',
+            width: '10%',
         },
         {
             title: 'URL',
@@ -19,8 +35,8 @@ export const AppView = ({ uuid, pollForData }) => {
         },
         {
             title: 'CPU',
-            dataIndex: 'cpu',
-            key: 'cpu',
+            dataIndex: 'cpuUsage',
+            key: 'cpuUsage',
             width: '12%',
         },
         {
@@ -36,27 +52,6 @@ export const AppView = ({ uuid, pollForData }) => {
             key: 'actions',
         },
     ];
-
-    const pollProcs = async () => {
-        if (pollForData) {
-            console.log('polling for app processes: ' + uuid)
-            const procList = await getAPI().getAppProcesses(uuid);
-            setData(procList);
-        }
-    }
-
-    const startPolling = () => {
-        timer = window.setInterval(() => pollProcs(), 1000);
-    }
-
-    const stopPolling = () => {
-        window.clearInterval(timer);
-    }
-
-    useEffect(() => {
-        startPolling()
-        return () => stopPolling()
-    })
 
     return <Table
         pagination={false}

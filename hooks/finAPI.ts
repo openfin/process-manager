@@ -94,6 +94,12 @@ export default {
     getAppProcesses: async (uuid: string):Promise<any[]> => {
         const app = await fin.Application.wrap({uuid});
         const pinfo = await app.getProcessInfo();
+        if (pinfo.entities) {
+            return pinfo.entities.map( (i) => {
+                console.log(i);
+                return Object.assign(i, { key: i.url})
+            });
+        }
         return pinfo.entities;
     },
     closeAllApplications: async () => {

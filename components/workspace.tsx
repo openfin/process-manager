@@ -22,12 +22,13 @@ function useWorkspaceItems(pollRate, brightness) {
 }
 
 export const Workspace = ({ pollRate, initialWidth, initialHeight, headerHeight, brightness }) => {
+    const defaultFontHeight = 18;
 
     const windowSize = useWindowSize();
-    const [size, setSize] = useState({ height: initialHeight, width: initialWidth });
-    const [canvasFont, setCanvasFont] = useState('18px Arial');
     const info = useWorkspaceInfo();
     const items = useWorkspaceItems(pollRate, brightness);
+    const [size, setSize] = useState({ height: initialHeight, width: initialWidth });
+    const [fontHeight, setFontHeight] = useState(defaultFontHeight);
 
     const canvasRef:MutableRefObject<HTMLCanvasElement> = useRef();
 
@@ -46,8 +47,8 @@ export const Workspace = ({ pollRate, initialWidth, initialHeight, headerHeight,
         setSize({ height: h, width: w });
 
         // device pixel ratio is used to prevent blurry text rendering
-        const xScaleFactor = size.width / info.virtualWidth;
-        const yScaleFactor = size.height / info.virtualHeight;
+        const xScaleFactor = w / info.virtualWidth;
+        const yScaleFactor = h / info.virtualHeight;
         const ratio = window.devicePixelRatio;
         canvasRef.current.width = w * ratio;
         canvasRef.current.height = h * ratio;
@@ -97,8 +98,8 @@ export const Workspace = ({ pollRate, initialWidth, initialHeight, headerHeight,
         ctx.lineWidth   = 1;
         ctx.strokeRect(l, t, w, h);
         ctx.fillStyle = "#000000";
-        ctx.font = canvasFont;
-        ctx.fillText(props.name, l+10, t+36, w);
+        ctx.font = `${fontHeight}px Arial`;
+        ctx.fillText(props.name, l+10, t + fontHeight+4, w);
     }
 
     const drawMonitorRect = (ctx:CanvasRenderingContext2D, props:Monitor) => {
@@ -112,10 +113,14 @@ export const Workspace = ({ pollRate, initialWidth, initialHeight, headerHeight,
 
         // monitor label
         ctx.fillStyle = "#000000";
-        ctx.font = canvasFont;
+        ctx.font = `${fontHeight}px Arial`;
         const label = `${w}W x ${h}H (${props.left},${props.top} to ${props.right},${props.bottom})`;
-        ctx.textAlign = "end"; 
-        ctx.fillText(label, props.right-10, props.top + 28, w);
+        ctx.textAlign = "end";
+        var width = ctx.measureText(label).width;
+        ctx.fillStyle = "rgba(255,255,255,0.7)";
+        ctx.fillRect(props.right - width-18, props.top, width, fontHeight*1.7);
+        ctx.fillStyle = "#000000";
+        ctx.fillText(label, props.right-10, props.top + fontHeight+4);
         ctx.textAlign = "start";
     }
 
@@ -127,7 +132,7 @@ export const Workspace = ({ pollRate, initialWidth, initialHeight, headerHeight,
             <Space>
             {info.monitors.map(function(mon) {
                 const label = `${mon.right-mon.left}W x ${mon.bottom-mon.top}H (${mon.left},${mon.top} to ${mon.right},${mon.bottom})`;
-                return <Button title={label} type="primary">{mon.name}</Button>;
+                return <Button key={mon.name} title={label} type="primary">{mon.name}</Button>;
             })}
             </Space>
         </div>

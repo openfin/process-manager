@@ -5,10 +5,10 @@ import { AppView } from '../components/appView'
 
 export default function PID() {
     const [uuid, setUUID] = useState('');
-    const [autoRefresh, setAutoRefresh] = useState(true)
+    const [refreshRate, setRefreshRate] = useState(1000)
 
-    const onRefreshToggle = (v: boolean) => {
-        setAutoRefresh(v)
+    const onRefreshUpdate = (v) => {
+        setRefreshRate(v)
     }
 
     // load pid value from URL ensuring it runs only once
@@ -21,8 +21,8 @@ export default function PID() {
         <div>
             <PageHeader title={`Process Manager - App: ${uuid}`} />
             <main>
-                <ViewHeader onChange={onRefreshToggle}></ViewHeader>
-                <AppView pollForData={autoRefresh} uuid={uuid} />
+                <ViewHeader onChange={onRefreshUpdate}></ViewHeader>
+                <AppView pollRate={refreshRate} uuid={uuid} />
             </main>
         </div>
     )
