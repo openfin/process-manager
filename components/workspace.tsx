@@ -22,7 +22,7 @@ function useWorkspaceItems(pollRate, brightness) {
 }
 
 export const Workspace = ({ pollRate, initialWidth, initialHeight, headerHeight, brightness }) => {
-    const defaultFontHeight = 18;
+    const defaultFontHeight = 24;
 
     const windowSize = useWindowSize();
     const info = useWorkspaceInfo();
@@ -35,8 +35,9 @@ export const Workspace = ({ pollRate, initialWidth, initialHeight, headerHeight,
     const labelHeight = 48;
 
     const calcSize = () => {
-        let w = document.body.clientWidth-20;
-        let h = document.body.clientHeight - (1*headerHeight + labelHeight);
+        const ratio = window.devicePixelRatio;
+        let w = document.body.clientWidth-(20+ratio);
+        let h = document.body.clientHeight - (1*headerHeight + labelHeight + ratio);
         const vaspect = info.virtualWidth / info.virtualHeight;
         const caspect = w / h;
         if ( vaspect > caspect ) {
@@ -46,14 +47,21 @@ export const Workspace = ({ pollRate, initialWidth, initialHeight, headerHeight,
         }
         setSize({ height: h, width: w });
 
+        if (h < 600) {
+            setFontHeight(32)
+        } else if (h < 300) {
+            setFontHeight(48)
+        } else {
+            setFontHeight(defaultFontHeight)
+        }
+
         // device pixel ratio is used to prevent blurry text rendering
         const xScaleFactor = w / info.virtualWidth;
         const yScaleFactor = h / info.virtualHeight;
-        const ratio = window.devicePixelRatio;
-        canvasRef.current.width = w * ratio;
-        canvasRef.current.height = h * ratio;
-        canvasRef.current.style.width = `${w}px`;
-        canvasRef.current.style.height = `${h}px`;
+        canvasRef.current.width = w * ratio + ratio;
+        canvasRef.current.height = h * ratio + ratio;
+        canvasRef.current.style.width = `${w + ratio}px`;
+        canvasRef.current.style.height = `${h + ratio}px`;
         canvasRef.current.getContext('2d').scale(xScaleFactor*ratio, yScaleFactor*ratio);
     }
 
@@ -109,7 +117,7 @@ export const Workspace = ({ pollRate, initialWidth, initialHeight, headerHeight,
         const l = props.left + info.xOffset;
 
         // monitor outline
-        ctx.strokeStyle = "#cccccc";
+        ctx.strokeStyle = "#777777";
         ctx.lineWidth   = 1;
         ctx.strokeRect(l, t, w, h);
 
@@ -120,9 +128,9 @@ export const Workspace = ({ pollRate, initialWidth, initialHeight, headerHeight,
         ctx.textAlign = "end";
         var width = ctx.measureText(label).width;
         ctx.fillStyle = "rgba(255,255,255,0.7)";
-        ctx.fillRect(props.right - width-18, props.top, width, fontHeight*1.7);
+        ctx.fillRect(props.right - width-18, t, width, fontHeight*1.7);
         ctx.fillStyle = "#000000";
-        ctx.fillText(label, props.right-10, props.top + fontHeight+4);
+        ctx.fillText(label, props.right-10, t + fontHeight+4);
         ctx.textAlign = "start";
     }
 
@@ -138,7 +146,7 @@ export const Workspace = ({ pollRate, initialWidth, initialHeight, headerHeight,
             })}
             </Space>
         </div>
-        <div style={{ height: size.height + 1}}>
+        <div style={{ height: size.height + 23}}>
             <canvas id="workspace" ref={canvasRef} />
         </div>
     </div>;

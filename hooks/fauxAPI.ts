@@ -191,11 +191,11 @@ export default {
     getWorkspaceInfo: async (): Promise<WorkspaceInfo> => {
         return {
             virtualLeft: 0,
-            virtualTop: 0,
-            virtualWidth: 1440,
-            virtualHeight: 900,
+            virtualTop: -356,
+            virtualWidth: 4000,
+            virtualHeight: 1440,
             xOffset: 0,
-            yOffset: 0,
+            yOffset: 356,
             monitors: [
                 {
                     bottom: 900,
@@ -203,6 +203,13 @@ export default {
                     right: 1440,
                     top: 0,
                     name: "Main Monitor"
+                },
+                {
+                    bottom: 1084,
+                    left: 1440,
+                    right: 4000,
+                    top: -356,
+                    name: "Monitor 1"
                 }
             ]
         }
