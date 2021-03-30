@@ -87,6 +87,8 @@ export interface WorkspaceInfo {
     virtualLeft: number;
     virtualHeight: number;
     virtualWidth: number;
+    xOffset: number;
+    yOffset: number;
     monitors: Monitor[];
 }
 

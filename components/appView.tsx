@@ -45,7 +45,6 @@ export const AppView = ({ uuid, pollRate }) => {
             key: 'privateSetSize',
             width: '12%',
             render: (text, record) => {
-                console.log(`what is mem? ${record.privateSetSize}`)
                 return formatBytes(record.privateSetSize, 1)
             },
         },

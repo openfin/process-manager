@@ -194,6 +194,8 @@ export default {
             virtualTop: 0,
             virtualWidth: 1440,
             virtualHeight: 900,
+            xOffset: 0,
+            yOffset: 0,
             monitors: [
                 {
                     bottom: 900,

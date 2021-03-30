@@ -96,7 +96,6 @@ export default {
         const pinfo = await app.getProcessInfo();
         if (pinfo.entities) {
             return pinfo.entities.map( (i) => {
-                console.log(i);
                 return Object.assign(i, { key: i.url})
             });
         }
@@ -178,11 +177,21 @@ export default {
     getWorkspaceInfo: async (): Promise<WorkspaceInfo> => {
         const monInfo = await fin.System.getMonitorInfo();
         const mons = getAllMonitors(monInfo);
+        let xoffset = 0;
+        if (monInfo.virtualScreen.left < 0) {
+            xoffset = Math.abs(monInfo.virtualScreen.left);
+        }
+        let yoffset = 0;
+        if (monInfo.virtualScreen.top < 0) {
+            yoffset = Math.abs(monInfo.virtualScreen.top);
+        }
         return {
             virtualTop: monInfo.virtualScreen.top,
             virtualLeft: monInfo.virtualScreen.left,
             virtualHeight: monInfo.virtualScreen.bottom - monInfo.virtualScreen.top, 
             virtualWidth: monInfo.virtualScreen.right - monInfo.virtualScreen.left,
+            xOffset: xoffset,
+            yOffset: yoffset,
             monitors: mons
         };
     }

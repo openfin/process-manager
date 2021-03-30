@@ -4,7 +4,7 @@ import { usePolling, useWindowSize } from '../hooks/utils'
 import { Button, Space } from 'antd'
 
 function useWorkspaceInfo() {
-    const [workspaceInfo, setWorkSpaceInfo] = useState({ virtualHeight: 0, virtualWidth: 0, virtualTop: 0, virtualLeft: 0, monitors: [] });
+    const [workspaceInfo, setWorkSpaceInfo] = useState({ virtualHeight: 0, virtualWidth: 0, virtualTop: 0, virtualLeft: 0, xOffset: 0, yOffset: 0, monitors: [] });
     usePolling(async () => {
         const info = await getAPI().getWorkspaceInfo()
         setWorkSpaceInfo(info);
@@ -89,8 +89,8 @@ export const Workspace = ({ pollRate, initialWidth, initialHeight, headerHeight,
     const drawWindowRect = (ctx:CanvasRenderingContext2D, props:WindowInfo) => {
         const h = props.bottom - props.top;
         const w = props.right - props.left;
-        const t = props.top;
-        const l = props.left;
+        const t = props.top + info.yOffset;
+        const l = props.left + info.xOffset;
 
         ctx.fillStyle = props.color;
         ctx.fillRect(l, t, w, h);
@@ -105,11 +105,13 @@ export const Workspace = ({ pollRate, initialWidth, initialHeight, headerHeight,
     const drawMonitorRect = (ctx:CanvasRenderingContext2D, props:Monitor) => {
         const h = props.bottom - props.top;
         const w = props.right - props.left;
+        const t = props.top + info.yOffset;
+        const l = props.left + info.xOffset;
 
         // monitor outline
         ctx.strokeStyle = "#cccccc";
         ctx.lineWidth   = 1;
-        ctx.strokeRect(props.left, props.top, w, h);
+        ctx.strokeRect(l, t, w, h);
 
         // monitor label
         ctx.fillStyle = "#000000";
