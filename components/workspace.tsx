@@ -128,7 +128,7 @@ export const Workspace = ({ pollRate, initialWidth, initialHeight, headerHeight,
         ctx.textAlign = "end";
         var width = ctx.measureText(label).width;
         ctx.fillStyle = "rgba(255,255,255,0.7)";
-        ctx.fillRect(props.right - width-18, t, width, fontHeight*1.7);
+        ctx.fillRect(props.right - (width+20), t+2, width+18, fontHeight*1.7);
         ctx.fillStyle = "#000000";
         ctx.fillText(label, props.right-10, t + fontHeight+4);
         ctx.textAlign = "start";

@@ -103,10 +103,10 @@ export default {
     },
     closeAllApplications: async () => {
         const myUUID = getUUID();
-        const procInfo = await fin.System.getAllProcessInfo();
-        await Promise.all(procInfo.apps.map( async p => {
-            if (p.uuid !== myUUID) {
-                const app = await fin.Application.wrap({ uuid: p.uuid});
+        const allApps = await fin.System.getAllApplications();
+        await Promise.all(allApps.map( async a => {
+            if (a.uuid !== myUUID) {
+                const app = await fin.Application.wrap({ uuid: a.uuid});
                 app.quit(true);
             }
         }))
